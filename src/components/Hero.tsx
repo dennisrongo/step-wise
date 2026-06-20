@@ -5,8 +5,10 @@ import { Ring } from "./Ring";
 
 // Count up to `target` over ~700ms with an ease-out curve.
 function useCountUp(target: number): number {
-  const [value, setValue] = useState(target);
-  const fromRef = useRef(target);
+  // Start at 0 so the count animates up on mount (and on each re-open, since
+  // the dashboard is re-keyed when the window regains focus).
+  const [value, setValue] = useState(0);
+  const fromRef = useRef(0);
   useEffect(() => {
     const from = fromRef.current;
     const start = performance.now();

@@ -9,7 +9,9 @@ use std::collections::HashMap;
 use chrono::{DateTime, Datelike, Duration, FixedOffset, Local, NaiveDate, Timelike};
 use serde_json::{json, Value};
 
-use super::{fill_deltas, label_for, DaySummary, HealthError, HourBucket, WeekSummary, GOAL};
+use super::{
+    fill_deltas, label_for, ActiveMode, DaySummary, HealthError, HourBucket, WeekSummary, GOAL,
+};
 use crate::oauth;
 
 const API_BASE: &str = "https://health.googleapis.com/v4";
@@ -26,6 +28,7 @@ pub async fn fetch_week(
     client_id: &str,
     client_secret: &str,
     refresh_token: &str,
+    active_mode: ActiveMode,
 ) -> Result<WeekSummary, HealthError> {
     let token = oauth::refresh(http, client_id, client_secret, refresh_token)
         .await?
@@ -41,7 +44,7 @@ pub async fn fetch_week(
     let distance = optional("distance", fetch_daily_distance(http, &token, start, today).await);
     let active = optional(
         "active minutes",
-        fetch_daily_active(http, &token, start, today).await,
+        fetch_daily_active(http, &token, start, today, active_mode).await,
     );
     let resting_hr = optional(
         "resting heart rate",
@@ -317,9 +320,10 @@ fn parse_daily_distance(value: &Value) -> HashMap<NaiveDate, f64> {
     map
 }
 
-/// `date -> active minutes`, summed across activity levels (light/moderate/
-/// vigorous). Falls back to a flat `activeMinutesSum` if present.
-fn parse_daily_active(value: &Value) -> HashMap<NaiveDate, u32> {
+/// `date -> active minutes`, summing only the activity levels the `mode` counts
+/// (Full = light+moderate+vigorous; ModerateVigorous excludes light). Falls back
+/// to a flat `activeMinutesSum` (Full only — a flat total can't be split).
+fn parse_daily_active(value: &Value, mode: ActiveMode) -> HashMap<NaiveDate, u32> {
     let mut map = HashMap::new();
     for p in rollup_points(value) {
         let Some(date) = point_date(p) else { continue };
@@ -330,14 +334,18 @@ fn parse_daily_active(value: &Value) -> HashMap<NaiveDate, u32> {
             .map(|levels| {
                 levels
                     .iter()
+                    .filter(|l| {
+                        let lvl = l.get("activityLevel").and_then(Value::as_str).unwrap_or("");
+                        mode.counts(lvl)
+                    })
                     .filter_map(|l| l.get("activeMinutesSum").map(parse_count))
                     .sum::<u64>()
             })
             .unwrap_or(0);
-        let total = if by_level > 0 {
-            by_level
-        } else {
+        let total = if by_level == 0 && mode == ActiveMode::Full {
             active.get("activeMinutesSum").map(parse_count).unwrap_or(0)
+        } else {
+            by_level
         };
         map.insert(date, total as u32);
     }
@@ -502,9 +510,10 @@ async fn fetch_daily_active(
     token: &str,
     start: NaiveDate,
     end: NaiveDate,
+    mode: ActiveMode,
 ) -> Result<HashMap<NaiveDate, u32>, HealthError> {
     let value = daily_rollup(http, token, "active-minutes", start, end).await?;
-    Ok(parse_daily_active(&value))
+    Ok(parse_daily_active(&value, mode))
 }
 
 async fn fetch_daily_resting_hr(
@@ -726,15 +735,37 @@ mod tests {
     }
 
     #[test]
-    fn parse_active_sums_across_activity_levels() {
+    fn parse_active_full_sums_all_levels() {
+        // Real shape from live data: light + moderate + vigorous = 171.
         let v = json!({ "rollupDataPoints": [
             { "civilStartTime": { "date": { "year": 2026, "month": 6, "day": 20 } },
               "activeMinutes": { "activeMinutesRollupByActivityLevel": [
-                  { "activityLevel": "MODERATE", "activeMinutesSum": 25 },
-                  { "activityLevel": "VIGOROUS", "activeMinutesSum": 17 }
+                  { "activityLevel": "LIGHT", "activeMinutesSum": "33" },
+                  { "activityLevel": "MODERATE", "activeMinutesSum": "30" },
+                  { "activityLevel": "VIGOROUS", "activeMinutesSum": "108" }
               ] } }
         ] });
-        assert_eq!(parse_daily_active(&v).get(&d(2026, 6, 20)), Some(&42));
+        assert_eq!(
+            parse_daily_active(&v, ActiveMode::Full).get(&d(2026, 6, 20)),
+            Some(&171)
+        );
+    }
+
+    #[test]
+    fn parse_active_moderate_vigorous_excludes_light() {
+        let v = json!({ "rollupDataPoints": [
+            { "civilStartTime": { "date": { "year": 2026, "month": 6, "day": 20 } },
+              "activeMinutes": { "activeMinutesRollupByActivityLevel": [
+                  { "activityLevel": "LIGHT", "activeMinutesSum": "33" },
+                  { "activityLevel": "MODERATE", "activeMinutesSum": "30" },
+                  { "activityLevel": "VIGOROUS", "activeMinutesSum": "108" }
+              ] } }
+        ] });
+        // 30 + 108; the 33 light minutes are excluded.
+        assert_eq!(
+            parse_daily_active(&v, ActiveMode::ModerateVigorous).get(&d(2026, 6, 20)),
+            Some(&138)
+        );
     }
 
     #[test]
@@ -743,7 +774,10 @@ mod tests {
             { "civilStartTime": { "date": { "year": 2026, "month": 6, "day": 20 } },
               "activeMinutes": { "activeMinutesSum": 51 } }
         ] });
-        assert_eq!(parse_daily_active(&v).get(&d(2026, 6, 20)), Some(&51));
+        assert_eq!(
+            parse_daily_active(&v, ActiveMode::Full).get(&d(2026, 6, 20)),
+            Some(&51)
+        );
     }
 
     #[test]

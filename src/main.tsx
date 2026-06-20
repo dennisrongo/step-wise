@@ -4,8 +4,12 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import App from "./App";
 import { HoverPopover } from "./components/HoverPopover";
 import { isTauriReady } from "./tauriReady";
+import { initTheme } from "./theme";
 import "./styles/theme.css";
 import "./styles/panel.css";
+
+// Apply the saved appearance before first paint (and keep windows + OS in sync).
+initTheme();
 
 // The hover popover loads this same bundle in a separate window; render the
 // compact glance there instead of the full app.

@@ -8,6 +8,36 @@ use serde::Serialize;
 
 pub const GOAL: u64 = 10_000;
 
+/// Which activity levels count toward the "active minutes" metric. `Full` counts
+/// light + moderate + vigorous (the default); `ModerateVigorous` excludes light.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ActiveMode {
+    Full,
+    ModerateVigorous,
+}
+
+impl ActiveMode {
+    /// Parse the wire value the frontend sends; anything unrecognized is `Full`.
+    pub fn from_opt(s: Option<&str>) -> Self {
+        match s {
+            Some("intense") | Some("moderate-vigorous") | Some("moderateVigorous") => {
+                ActiveMode::ModerateVigorous
+            }
+            _ => ActiveMode::Full,
+        }
+    }
+
+    /// Whether an API activity-level label counts under this mode.
+    pub fn counts(&self, level: &str) -> bool {
+        match self {
+            ActiveMode::Full => true,
+            ActiveMode::ModerateVigorous => {
+                level.eq_ignore_ascii_case("MODERATE") || level.eq_ignore_ascii_case("VIGOROUS")
+            }
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HourBucket {

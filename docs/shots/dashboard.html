@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  .sw-panel[data-theme="light"]{--p-bg:#fbfbfd;--p-bg-2:#f1f1f4;--p-fg:#1d1d1f;--p-muted:#86868b;--p-faint:#c7c7cc;--p-border:rgba(0,0,0,.08);--p-track:#e6e6ea;--accent:#007aff;--good:#34c759;--bad:#ff3b30;}
+  .sw-panel[data-theme="dark"]{--p-bg:#242426;--p-bg-2:#2e2e31;--p-fg:#f5f5f7;--p-muted:#98989d;--p-faint:#56565a;--p-border:rgba(255,255,255,.10);--p-track:#3a3a3c;--accent:#0a84ff;--good:#30d158;--bad:#ff453a;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1180px;height:720px}
+  body{display:flex;align-items:center;justify-content:center;gap:48px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(120% 120% at 78% -10%,#dfe6f0 0%,#c5d0e0 45%,#aab8cd 100%);}
+  .sw-panel{width:360px;background:var(--p-bg);color:var(--p-fg);border:1px solid var(--p-border);border-radius:13px;overflow:hidden;box-shadow:0 30px 70px -22px rgba(20,30,50,.5),0 4px 14px rgba(0,0,0,.12);display:flex;flex-direction:column;}
+  .sw-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 11px}
+  .sw-name{font-size:14px;font-weight:640;letter-spacing:-.012em}
+  .sw-status{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--p-muted);font-variant-numeric:tabular-nums}
+  .sw-dot{width:6px;height:6px;border-radius:50%;background:var(--good)}
+  .gear{color:var(--p-muted);display:flex}
+  .sw-hero{display:flex;flex-direction:column;align-items:center;padding:6px 16px 12px}
+  .rw{position:relative;width:168px;height:168px}
+  .rn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .steps{font-size:35px;font-weight:620;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+  .slbl{margin-top:6px;font-size:9.5px;font-weight:640;letter-spacing:.16em;color:var(--p-muted)}
+  .togo{margin-top:13px;font-size:12.5px;color:var(--p-muted)}.togo b{color:var(--p-fg);font-weight:640}
+  .sec{padding:8px 16px}
+  .sl{display:flex;justify-content:space-between;align-items:baseline;font-size:9.5px;font-weight:660;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted);margin-bottom:9px}
+  .hours{display:flex;align-items:flex-end;gap:3px;height:48px}
+  .hb{flex:1;background:var(--p-track);border-radius:3px;min-height:3px}.hb.now{background:var(--accent)}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 16px}
+  .card{background:var(--p-bg-2);border-radius:11px;padding:11px 12px 10px}
+  .cl{font-size:9.5px;font-weight:620;letter-spacing:.05em;text-transform:uppercase;color:var(--p-muted)}
+  .cv{font-size:18px;font-weight:640;letter-spacing:-.012em;margin-top:5px;display:flex;align-items:baseline;gap:3px;font-variant-numeric:tabular-nums}
+  .cu{font-size:11px;font-weight:520;color:var(--p-muted)}
+  .tr{display:inline-flex;align-items:center;gap:3px;margin-top:6px;font-size:10.5px;font-weight:560;font-variant-numeric:tabular-nums}
+  .tr.good{color:var(--good)}.tr.bad{color:var(--bad)}
+  .week{display:flex;gap:6px;padding:2px 0}
+  .day{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;padding:5px 0 4px;border-radius:9px}
+  .dt{height:42px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+  .db{width:62%;max-width:17px;background:var(--p-track);border-radius:3px}
+  .day.sel .db{background:var(--accent)}
+  .dl{font-size:10.5px;color:var(--p-muted);font-weight:520}
+  .day.sel .dl{color:var(--p-fg);font-weight:660}
+  .day.today .dl::after{content:"";display:block;width:3px;height:3px;border-radius:50%;background:var(--accent);margin:3px auto 0}
+</style>
+</head>
+<body>
+  <div class="sw-panel" data-theme="light"></div>
+  <div class="sw-panel" data-theme="dark"></div>
+<script>
+  var HOURS=[5,3,3,4,7,12,22,38,44,30,26,28,46,38,48];
+  var DAYS=[["Fr",26],["Sa",42],["Su",35],["Mo",32],["Tu",40],["We",24],["Th",30]];
+  var CIRC=2*Math.PI*74, OFF=CIRC*(1-0.8427);
+  function ring(){return '<svg width="168" height="168" viewBox="0 0 168 168">'
+    +'<circle cx="84" cy="84" r="74" fill="none" stroke="var(--p-track)" stroke-width="7"/>'
+    +'<circle cx="84" cy="84" r="74" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round" transform="rotate(-90 84 84)" stroke-dasharray="'+CIRC+'" stroke-dashoffset="'+OFF+'"/></svg>';}
+  var UP='<svg viewBox="0 0 8 8" width="7" height="7" fill="currentColor"><path d="M4 1.4 7.2 6.4H.8z"/></svg>';
+  var DN='<svg viewBox="0 0 8 8" width="7" height="7" fill="currentColor"><path d="M4 6.6 .8 1.6H7.2z"/></svg>';
+  var GEAR='<svg class="gear" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 2.6 14H2.5a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 2.6V2.5a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V7a1.6 1.6 0 0 0 1.4 1h.1a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.4 1z"/></svg>';
+  var maxH=Math.max.apply(null,HOURS), maxD=Math.max.apply(null,DAYS.map(function(d){return d[1]}));
+  function card(l,v,u,t,cls){return '<div class="card"><div class="cl">'+l+'</div><div class="cv">'+v+(u?'<span class="cu">'+u+'</span>':'')+'</div><div class="tr '+cls+'">'+(cls==='good'?(l==='Resting HR'?DN:UP):(l==='Active'?DN:UP))+t+'</div></div>';}
+  function fill(p){
+    p.innerHTML=''
+    +'<div class="sw-head"><div class="sw-name">Stepwise</div><div class="sw-status"><span class="sw-dot"></span>Synced 3 min ago'+GEAR+'</div></div>'
+    +'<div class="sw-hero"><div class="rw">'+ring()+'<div class="rn"><div class="steps">8,427</div><div class="slbl">STEPS</div></div></div><div class="togo"><b>1,573</b> to go</div></div>'
+    +'<div class="sec"><div class="sl"><span>TODAY</span><span>since 12 AM</span></div><div class="hours">'+HOURS.map(function(h,i){return '<div class="hb'+(i===HOURS.length-1?' now':'')+'" style="height:'+Math.max(3,Math.round(h/maxH*48))+'px"></div>';}).join('')+'</div></div>'
+    +'<div class="cards">'+card('Resting HR','58','bpm','3','good')+card('Sleep','7h12','','18m','good')+card('Distance','3.8','mi','0.4','good')+card('Active','42','min','6','bad')+'</div>'
+    +'<div class="sec"><div class="sl"><span>LAST 7 DAYS</span></div><div class="week">'+DAYS.map(function(d,i){var today=i===6;return '<div class="day'+(today?' today sel':'')+'"><div class="dt"><div class="db" style="height:'+Math.max(4,Math.round(d[1]/maxD*42))+'px"></div></div><div class="dl">'+d[0]+'</div></div>';}).join('')+'</div></div>';
+  }
+  document.querySelectorAll('.sw-panel').forEach(fill);
+</script>
+</body>
+</html>

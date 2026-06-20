@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 const R = 74;
 const CIRC = 2 * Math.PI * R;
 
-/** Thin circular progress ring. `pct` is 0..1. */
+/** Thin circular progress ring. `pct` is 0..1. Fills from empty on mount. */
 export function Ring({
   pct,
   showProgress = true,
@@ -13,7 +13,15 @@ export function Ring({
   showProgress?: boolean;
   children: ReactNode;
 }) {
-  const offset = CIRC * (1 - Math.min(Math.max(pct, 0), 1));
+  const target = CIRC * (1 - Math.min(Math.max(pct, 0), 1));
+  // Start empty, then transition to target on the next frame so the ring
+  // animates in (the CSS transition on .sw-ring-prog does the easing).
+  const [offset, setOffset] = useState(CIRC);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setOffset(target));
+    return () => cancelAnimationFrame(id);
+  }, [target]);
+
   return (
     <div className="sw-ring-wrap">
       <svg width="168" height="168" viewBox="0 0 168 168">

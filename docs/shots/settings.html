@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  .sw-panel[data-theme="light"]{--p-bg:#fbfbfd;--p-bg-2:#f1f1f4;--p-fg:#1d1d1f;--p-muted:#86868b;--p-faint:#c7c7cc;--p-border:rgba(0,0,0,.08);--accent:#007aff;--good:#34c759;--bad:#ff3b30;}
+  .sw-panel[data-theme="dark"]{--p-bg:#242426;--p-bg-2:#2e2e31;--p-fg:#f5f5f7;--p-muted:#98989d;--p-faint:#56565a;--p-border:rgba(255,255,255,.10);--accent:#0a84ff;--good:#30d158;--bad:#ff453a;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:880px;height:700px}
+  body{display:flex;align-items:center;justify-content:center;gap:42px;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(120% 120% at 78% -10%,#dfe6f0 0%,#c5d0e0 45%,#aab8cd 100%);}
+  .sw-panel{width:360px;background:var(--p-bg);color:var(--p-fg);border:1px solid var(--p-border);border-radius:13px;overflow:hidden;box-shadow:0 30px 70px -22px rgba(20,30,50,.5),0 4px 14px rgba(0,0,0,.12);}
+  .set-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--p-border)}
+  .set-back{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:560;color:var(--accent);background:none;border:0;font-family:inherit}
+  .set-back svg{width:13px;height:13px}
+  .set-title{font-size:13px;font-weight:650;letter-spacing:-.01em}.set-spacer{width:54px}
+  .set-body{padding:14px 15px 16px;display:flex;flex-direction:column;gap:16px}
+  .set-section{display:flex;flex-direction:column;gap:8px}
+  .set-label{font-size:10px;font-weight:660;letter-spacing:.07em;text-transform:uppercase;color:var(--p-muted);padding-left:3px}
+  .set-card{background:var(--p-bg-2);border-radius:11px;overflow:hidden}
+  .ap-card{padding:13px 13px 12px}
+  .ap-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+  .ap-tile{display:flex;flex-direction:column;align-items:center;gap:7px}
+  .ap-thumb{width:100%;height:52px;border-radius:8px;position:relative;overflow:hidden;border:1px solid var(--p-border)}
+  .ap-thumb.light{background:#fbfbfd}.ap-thumb.dark{background:#242426}.ap-thumb.auto{background:linear-gradient(120deg,#fbfbfd 0 50%,#242426 50% 100%)}
+  .ap-bar{position:absolute;top:7px;left:8px;right:8px;height:5px;border-radius:3px}
+  .ap-thumb.light .ap-bar{background:#e6e6ea}.ap-thumb.dark .ap-bar{background:#3a3a3c}.ap-thumb.auto .ap-bar{background:linear-gradient(90deg,#e6e6ea 50%,#3a3a3c 50%)}
+  .ap-ring{position:absolute;left:50%;top:54%;width:22px;height:22px;border-radius:50%;border:3px solid #d3d3d8;border-top-color:#007aff;transform:translate(-50%,-50%) rotate(35deg)}
+  .ap-thumb.dark .ap-ring{border-color:#3a3a3c;border-top-color:#0a84ff}.ap-thumb.auto .ap-ring{border-color:#7a7a80;border-top-color:#0a84ff}
+  .ap-name{font-size:11px;font-weight:560;color:var(--p-muted)}
+  .ap-tile.sel .ap-thumb{box-shadow:0 0 0 2px var(--p-bg),0 0 0 4px var(--accent)}
+  .ap-tile.sel .ap-name{color:var(--p-fg);font-weight:650}
+  .ap-help{margin-top:11px;font-size:11px;line-height:1.45;color:var(--p-muted)}
+  .am-card{padding:13px 13px 12px}
+  .am-seg{display:flex;gap:7px}
+  .am-opt{flex:1;border:1px solid var(--p-border);background:var(--p-bg);color:var(--p-muted);border-radius:8px;padding:8px;font-size:11.5px;font-weight:560;font-family:inherit}
+  .am-opt.sel{border-color:var(--accent);color:var(--p-fg);background:color-mix(in oklab,var(--accent) 10%,var(--p-bg))}
+  .set-row{display:flex;align-items:center;gap:9px;padding:11px 13px}
+  .set-row+.set-row{border-top:1px solid var(--p-border)}
+  .r-dot{width:8px;height:8px;border-radius:50%}.r-dot.ok{background:var(--good)}
+  .r-main{display:flex;flex-direction:column;gap:2px}
+  .r-label{font-size:12.5px;font-weight:560;letter-spacing:-.01em}
+  .r-sub{font-size:10.5px;color:var(--p-muted);font-variant-numeric:tabular-nums}
+  .r-spacer{flex:1}
+  .r-val{font-size:11.5px;color:var(--p-muted);font-variant-numeric:tabular-nums}
+  .r-btn{font-size:11.5px;font-weight:560;color:var(--accent);background:none;border:0;font-family:inherit}
+  .r-link{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:560;color:var(--accent);background:none;border:0;font-family:inherit}
+  .r-link svg{width:11px;height:11px;opacity:.8}
+  .gh-actions{display:flex;gap:8px;padding:11px 13px 12px;border-top:1px solid var(--p-border)}
+  .gh-btn{flex:1;padding:8px 10px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:560;border:1px solid var(--p-border);background:var(--p-bg);color:var(--p-fg)}
+  .gh-btn.danger{color:var(--bad);border-color:color-mix(in oklab,var(--bad) 26%,var(--p-border));background:color-mix(in oklab,var(--bad) 7%,var(--p-bg))}
+</style>
+</head>
+<body>
+  <div class="sw-panel" data-theme="light"></div>
+  <div class="sw-panel" data-theme="dark"></div>
+<script>
+  var EXT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>';
+  var BACK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>';
+  function tiles(selMode){
+    return [["light","Light"],["dark","Dark"],["system","Auto"]].map(function(t){
+      var cls=t[0]==="system"?"auto":t[0];
+      return '<div class="ap-tile'+(t[0]===selMode?' sel':'')+'"><div class="ap-thumb '+cls+'"><div class="ap-bar"></div><div class="ap-ring"></div></div><div class="ap-name">'+t[1]+'</div></div>';
+    }).join('');
+  }
+  function fill(p){
+    var selMode=p.getAttribute("data-theme")==="dark"?"dark":"light";
+    p.innerHTML=''
+    +'<div class="set-head"><button class="set-back">'+BACK+'Today</button><span class="set-title">Settings</span><span class="set-spacer"></span></div>'
+    +'<div class="set-body">'
+    +'<div class="set-section"><div class="set-label">Appearance</div><div class="set-card ap-card"><div class="ap-tiles">'+tiles(selMode)+'</div><div class="ap-help">Match your Mac\'s appearance, or force a mode.</div></div></div>'
+    +'<div class="set-section"><div class="set-label">Active minutes</div><div class="set-card am-card"><div class="am-seg"><button class="am-opt sel">All activity</button><button class="am-opt">Moderate &amp; vigorous</button></div><div class="ap-help">Counts light, moderate, and vigorous active minutes.</div></div></div>'
+    +'<div class="set-section"><div class="set-label">Google Health</div><div class="set-card"><div class="set-row"><span class="r-dot ok"></span><div class="r-main"><span class="r-label">Connected</span><span class="r-sub">Last sync 3 min ago</span></div></div><div class="gh-actions"><button class="gh-btn">Switch account</button><button class="gh-btn danger">Disconnect</button></div></div></div>'
+    +'<div class="set-section"><div class="set-label">Updates</div><div class="set-card"><div class="set-row"><div class="r-main"><span class="r-label">Stepwise is up to date</span><span class="r-sub">Version 0.1.0</span></div><span class="r-spacer"></span><button class="r-btn">Check</button></div></div></div>'
+    +'<div class="set-section"><div class="set-label">About</div><div class="set-card"><div class="set-row"><span class="r-label">Version</span><span class="r-spacer"></span><span class="r-val">0.1.0</span></div><div class="set-row"><span class="r-label">Made by</span><span class="r-spacer"></span><button class="r-link">Dennis Rongo '+EXT+'</button></div><div class="set-row"><span class="r-label">Data source</span><span class="r-spacer"></span><span class="r-val">Local · Google Health</span></div></div></div>'
+    +'</div>';
+  }
+  document.querySelectorAll('.sw-panel').forEach(fill);
+</script>
+</body>
+</html>

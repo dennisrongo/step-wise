@@ -1,17 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { isTauriReady } from "../tauriReady";
+import { getActiveMode } from "../activeMode";
 import { DEMO_STATUS, DEMO_WEEK } from "../mockData";
 import type { DaySummary, SyncStatus, WeekSummary } from "../types";
 
 // Thin command caller with a browser-preview fallback. Lives in the hook layer
 // so components stay free of `invoke`.
-async function call<T>(command: string, fallback: T): Promise<T> {
+async function call<T>(
+  command: string,
+  fallback: T,
+  args?: Record<string, unknown>,
+): Promise<T> {
   if (!isTauriReady()) {
     console.info(`[stepwise] browser preview — demo data for "${command}"`);
     return fallback;
   }
-  return invoke<T>(command);
+  return invoke<T>(command, args);
 }
 
 export interface HealthApi {
@@ -36,7 +41,9 @@ export function useHealth(): HealthApi {
 
   const loadWeek = useCallback(async () => {
     try {
-      const w = await call<WeekSummary>("get_week_summary", DEMO_WEEK);
+      const w = await call<WeekSummary>("get_week_summary", DEMO_WEEK, {
+        activeMode: getActiveMode(),
+      });
       setWeek(w);
       setError(null);
       const todayIdx = w.days.findIndex((d) => d.isToday);
@@ -61,12 +68,12 @@ export function useHealth(): HealthApi {
   }, [applyStatus]);
 
   const run = useCallback(
-    async (command: string) => {
+    async (command: string, args?: Record<string, unknown>) => {
       setSyncing(true);
       setError(null);
       try {
         const s = isTauriReady()
-          ? await invoke<SyncStatus>(command)
+          ? await invoke<SyncStatus>(command, args)
           : DEMO_STATUS;
         await applyStatus(s);
       } catch (e) {
@@ -80,7 +87,10 @@ export function useHealth(): HealthApi {
 
   const connect = useCallback(() => run("connect_google_health"), [run]);
   const disconnect = useCallback(() => run("disconnect"), [run]);
-  const refreshNow = useCallback(() => run("refresh_now"), [run]);
+  const refreshNow = useCallback(
+    () => run("refresh_now", { activeMode: getActiveMode() }),
+    [run],
+  );
 
   const selectedDay = week && week.days[selected] ? week.days[selected] : null;
 

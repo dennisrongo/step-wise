@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { useHealth } from "./hooks/useHealth";
+import { useOpenSignal } from "./useOpenSignal";
 import { Panel } from "./components/Panel";
 import { Header } from "./components/Header";
+import { Settings } from "./components/Settings";
 import { ConnectedView } from "./components/ConnectedView";
 import { ReconnectState } from "./components/states/ReconnectState";
 import { NoDataState } from "./components/states/NoDataState";
@@ -30,6 +33,10 @@ export default function App() {
     refreshNow,
   } = useHealth();
 
+  const [showSettings, setShowSettings] = useState(false);
+  const openSettings = () => setShowSettings(true);
+  const openSignal = useOpenSignal();
+
   if (!status) {
     return (
       <Panel>
@@ -39,10 +46,25 @@ export default function App() {
     );
   }
 
+  // Settings is reachable from any connected/reconnect state via the kebab menu.
+  if (showSettings) {
+    return (
+      <Panel>
+        <Settings
+          status={status}
+          onBack={() => setShowSettings(false)}
+          onReconnect={connect}
+          onDisconnect={disconnect}
+          onActiveModeChange={refreshNow}
+        />
+      </Panel>
+    );
+  }
+
   if (status.state === "reconnect") {
     return (
       <Panel>
-        <Header status={status} syncing={syncing} />
+        <Header status={status} syncing={syncing} onSettings={openSettings} />
         <ReconnectState
           onConnect={connect}
           busy={syncing}
@@ -63,8 +85,7 @@ export default function App() {
             status={status}
             syncing={syncing}
             onRefresh={refreshNow}
-            onReconnect={connect}
-            onDisconnect={disconnect}
+            onSettings={openSettings}
           />
           <ErrorState onRetry={refreshNow} onReconnect={connect} busy={syncing} error={error} />
         </Panel>
@@ -72,7 +93,7 @@ export default function App() {
     }
     return (
       <Panel>
-        <Header status={status} syncing={syncing} onRefresh={refreshNow} />
+        <Header status={status} syncing={syncing} onRefresh={refreshNow} onSettings={openSettings} />
         <Loading />
       </Panel>
     );
@@ -81,13 +102,12 @@ export default function App() {
   const zeroToday = selectedDay.isToday && selectedDay.steps === 0;
 
   return (
-    <Panel>
+    <Panel key={openSignal}>
       <Header
         status={status}
         syncing={syncing}
         onRefresh={refreshNow}
-        onReconnect={connect}
-        onDisconnect={disconnect}
+        onSettings={openSettings}
       />
       {zeroToday ? (
         <NoDataState week={week} selected={selected} onSelect={setSelected} />

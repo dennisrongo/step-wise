@@ -7,7 +7,7 @@ use tauri_plugin_opener::OpenerExt;
 use tokio::sync::Mutex;
 
 use crate::encryption;
-use crate::health::{self, DaySummary, HealthError, SyncStatus, WeekSummary};
+use crate::health::{self, ActiveMode, DaySummary, HealthError, SyncStatus, WeekSummary};
 use crate::oauth;
 use crate::state::AppState;
 
@@ -84,13 +84,16 @@ fn require(
     }
 }
 
-async fn build_week(state: &State<'_, Mutex<AppState>>) -> Result<WeekSummary, String> {
+async fn build_week(
+    state: &State<'_, Mutex<AppState>>,
+    active_mode: ActiveMode,
+) -> Result<WeekSummary, String> {
     let (demo, http, cid, csec, token) = gather(state).await?;
     if demo {
         return Ok(health::demo::week());
     }
     let (cid, csec, token) = require(cid, csec, token)?;
-    health::google::fetch_week(&http, &cid, &csec, &token)
+    health::google::fetch_week(&http, &cid, &csec, &token, active_mode)
         .await
         .map_err(|e| {
             // Surface the real reason in the console: this is what otherwise turns
@@ -107,16 +110,20 @@ pub async fn get_sync_status(state: State<'_, Mutex<AppState>>) -> Result<SyncSt
 }
 
 #[tauri::command]
-pub async fn get_week_summary(state: State<'_, Mutex<AppState>>) -> Result<WeekSummary, String> {
-    build_week(&state).await
+pub async fn get_week_summary(
+    state: State<'_, Mutex<AppState>>,
+    active_mode: Option<String>,
+) -> Result<WeekSummary, String> {
+    build_week(&state, ActiveMode::from_opt(active_mode.as_deref())).await
 }
 
 #[tauri::command]
 pub async fn get_day_summary(
     state: State<'_, Mutex<AppState>>,
     date: Option<String>,
+    active_mode: Option<String>,
 ) -> Result<DaySummary, String> {
-    let week = build_week(&state).await?;
+    let week = build_week(&state, ActiveMode::from_opt(active_mode.as_deref())).await?;
     let day = match date {
         Some(d) => week.days.into_iter().find(|x| x.date == d),
         None => week.days.into_iter().find(|x| x.is_today),
@@ -190,11 +197,12 @@ pub async fn disconnect(
 pub async fn refresh_now(
     app: AppHandle,
     state: State<'_, Mutex<AppState>>,
+    active_mode: Option<String>,
 ) -> Result<SyncStatus, String> {
     {
         state.lock().await.syncing = true;
     }
-    let result = build_week(&state).await;
+    let result = build_week(&state, ActiveMode::from_opt(active_mode.as_deref())).await;
     let now = Utc::now().to_rfc3339();
 
     let mut st = state.lock().await;
