@@ -1,0 +1,59 @@
+[package]
+name = "stepwise"
+version = "0.1.0"
+description = "Stepwise — a calm macOS menu-bar health dashboard."
+authors = ["Dennis Rongo"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "stepwise_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png", "macos-private-api"] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-single-instance = "2"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+tokio = { version = "1", features = ["sync", "rt-multi-thread", "macros", "time"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+chrono = { version = "0.4", features = ["clock", "serde"] }
+dirs = "5"
+dotenvy = "0.15"
+
+# OAuth + Google Health HTTP client
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+url = "2"
+sha2 = "0.10"
+base64 = "0.22"
+rand = "0.8"
+
+# Encrypted secrets at rest
+aes-gcm = "0.10"
+argon2 = "0.5"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+embed_plist = "1"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"

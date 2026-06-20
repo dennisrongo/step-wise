@@ -1,0 +1,17 @@
+# dependencies / build output
+node_modules/
+dist/
+src-tauri/target/
+
+# secrets — only .env.example is tracked
+.env
+.env.*
+!.env.example
+.gh-tokens.json
+
+# WIP / editor artefacts that must never be committed
+*.backup
+*.orig
+*.temp
+*.swp
+.DS_Store

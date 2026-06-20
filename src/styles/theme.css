@@ -1,0 +1,75 @@
+/* macOS-native tokens. Follows system appearance by default; a [data-theme]
+   attribute on <html> overrides it (for a future manual toggle). System Blue is
+   the only accent — reserved for progress + active states. */
+:root,
+:root[data-theme="light"] {
+  --sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", system-ui, sans-serif;
+
+  --p-bg: #fbfbfd;
+  --p-bg-2: #f1f1f4;
+  --p-fg: #1d1d1f;
+  --p-muted: #86868b;
+  --p-faint: #c7c7cc;
+  --p-border: rgba(0, 0, 0, 0.08);
+  --p-track: #e6e6ea;
+  --accent: #007aff;
+  --good: #34c759;
+  --bad: #ff3b30;
+  --warn: #ff9f0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --p-bg: #242426;
+    --p-bg-2: #2e2e31;
+    --p-fg: #f5f5f7;
+    --p-muted: #98989d;
+    --p-faint: #56565a;
+    --p-border: rgba(255, 255, 255, 0.1);
+    --p-track: #3a3a3c;
+    --accent: #0a84ff;
+    --good: #30d158;
+    --bad: #ff453a;
+    --warn: #ff9f0a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --p-bg: #242426;
+  --p-bg-2: #2e2e31;
+  --p-fg: #f5f5f7;
+  --p-muted: #98989d;
+  --p-faint: #56565a;
+  --p-border: rgba(255, 255, 255, 0.1);
+  --p-track: #3a3a3c;
+  --accent: #0a84ff;
+  --good: #30d158;
+  --bad: #ff453a;
+  --warn: #ff9f0a;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+/* The Tauri window is transparent; the panel is the only opaque surface, so it
+   reads as a floating macOS popover with its own shadow + rounded corners. */
+body {
+  background: transparent;
+  font-family: var(--sf);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--p-fg);
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
