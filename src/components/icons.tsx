@@ -33,6 +33,36 @@ export function LinkSlash({ size = 22 }: { size?: number }) {
   );
 }
 
+export function WarningIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M10.3 3.9 2.4 18a1.9 1.9 0 0 0 1.7 2.9h15.8a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0z" />
+      <path d="M12 9.5v4.5" />
+      <path d="M12 17.3h.01" />
+    </svg>
+  );
+}
+
+export function KebabIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="5" r="1.7" />
+      <circle cx="12" cy="12" r="1.7" />
+      <circle cx="12" cy="19" r="1.7" />
+    </svg>
+  );
+}
+
 export function ChevronUp() {
   return (
     <svg viewBox="0 0 8 8" width="7" height="7" fill="currentColor" aria-hidden="true">

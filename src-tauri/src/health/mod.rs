@@ -55,6 +55,12 @@ pub struct SyncStatus {
 pub enum HealthError {
     #[error("not connected to Google Health")]
     NotConnected,
+    /// The OAuth grant is valid, but the account has no Google Health profile
+    /// yet (FAILED_PRECONDITION / ACCOUNT_NOT_LINKED). Actionable: the user must
+    /// finish setup at `signup_url`. The stable `ACCOUNT_NOT_LINKED` token lets
+    /// the frontend show a guided state instead of raw JSON.
+    #[error("ACCOUNT_NOT_LINKED — this Google account isn't linked to Google Health yet (set it up at {signup_url})")]
+    AccountNotLinked { signup_url: String },
     #[error(transparent)]
     OAuth(#[from] crate::oauth::OAuthError),
     #[error("http: {0}")]

@@ -74,7 +74,10 @@ pub fn start_flow(client_id: &str, scope: &str) -> Result<AuthFlow, OAuthError> 
             ("code_challenge", &challenge),
             ("code_challenge_method", "S256"),
             ("access_type", "offline"),
-            ("prompt", "consent"),
+            // `select_account` always shows the account chooser (so the user can
+            // pick a different account — e.g. one that's linked to Google Health);
+            // `consent` guarantees a refresh token is returned.
+            ("prompt", "select_account consent"),
             ("state", &state),
         ],
     )

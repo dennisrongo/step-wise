@@ -11,8 +11,13 @@ use crate::health::{self, DaySummary, HealthError, SyncStatus, WeekSummary};
 use crate::oauth;
 use crate::state::AppState;
 
-// activity_and_fitness covers steps, distance, active minutes, etc.
-const SCOPE: &str = "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly";
+// Space-separated scopes. activity_and_fitness covers steps, distance and active
+// minutes; resting HR needs health_metrics_and_measurements; sleep needs sleep.
+// Adding scopes requires the user to reconnect (re-consent) before the new
+// metrics return data.
+const SCOPE: &str = "https://www.googleapis.com/auth/googlehealth.activity_and_fitness.readonly \
+    https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.readonly \
+    https://www.googleapis.com/auth/googlehealth.sleep.readonly";
 
 fn humanize_since(rfc3339: &str) -> Option<String> {
     let dt = DateTime::parse_from_rfc3339(rfc3339).ok()?.with_timezone(&Utc);
@@ -87,7 +92,12 @@ async fn build_week(state: &State<'_, Mutex<AppState>>) -> Result<WeekSummary, S
     let (cid, csec, token) = require(cid, csec, token)?;
     health::google::fetch_week(&http, &cid, &csec, &token)
         .await
-        .map_err(|e| e.to_string())
+        .map_err(|e| {
+            // Surface the real reason in the console: this is what otherwise turns
+            // into a silent spinner in the UI.
+            tracing::error!("week summary fetch failed: {e}");
+            e.to_string()
+        })
 }
 
 #[tauri::command]

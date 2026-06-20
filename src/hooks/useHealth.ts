@@ -23,6 +23,7 @@ export interface HealthApi {
   error: string | null;
   setSelected: (i: number) => void;
   connect: () => Promise<void>;
+  disconnect: () => Promise<void>;
   refreshNow: () => Promise<void>;
 }
 
@@ -37,6 +38,7 @@ export function useHealth(): HealthApi {
     try {
       const w = await call<WeekSummary>("get_week_summary", DEMO_WEEK);
       setWeek(w);
+      setError(null);
       const todayIdx = w.days.findIndex((d) => d.isToday);
       setSelected(todayIdx >= 0 ? todayIdx : Math.max(0, w.days.length - 1));
     } catch (e) {
@@ -77,6 +79,7 @@ export function useHealth(): HealthApi {
   );
 
   const connect = useCallback(() => run("connect_google_health"), [run]);
+  const disconnect = useCallback(() => run("disconnect"), [run]);
   const refreshNow = useCallback(() => run("refresh_now"), [run]);
 
   const selectedDay = week && week.days[selected] ? week.days[selected] : null;
@@ -90,6 +93,7 @@ export function useHealth(): HealthApi {
     error,
     setSelected,
     connect,
+    disconnect,
     refreshNow,
   };
 }
