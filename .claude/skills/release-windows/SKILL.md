@@ -55,7 +55,7 @@ Do **not** trigger for a local dev build (`npm run tauri dev`, `cargo build`).
 7. **Verify externally** that the public endpoint serves all three platforms **and that the Windows payload is a STORED zip at the right version** (this is the check that catches a broken auto-update before users hit it):
    ```bash
    # manifest: version + platforms, and the windows URL must point at THIS version's zip
-   curl -sL https://github.com/dennisrongo/health-tracker/releases/latest/download/latest.json \
+   curl -sL https://github.com/dennisrongo/step-wise/releases/latest/download/latest.json \
      | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['version'],sorted(d['platforms']));print(d['platforms']['windows-x86_64']['url'])"
 
    # download that windows zip and assert STORED (compress_type 0) + integrity

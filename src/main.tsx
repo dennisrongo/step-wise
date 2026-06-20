@@ -4,12 +4,18 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import App from "./App";
 import { HoverPopover } from "./components/HoverPopover";
 import { isTauriReady } from "./tauriReady";
+import { isWindows } from "./platform";
 import { initTheme } from "./theme";
 import "./styles/theme.css";
 import "./styles/panel.css";
 
 // Apply the saved appearance before first paint (and keep windows + OS in sync).
 initTheme();
+
+// Windows uses an opaque, OS-shadowed window (see tauri.windows.conf.json +
+// tray.rs); flag it so the panel / hover card fill the window edge-to-edge
+// instead of floating with a transparent margin (the macOS popover look).
+if (isWindows) document.documentElement.classList.add("win");
 
 // The hover popover loads this same bundle in a separate window; render the
 // compact glance there instead of the full app.

@@ -113,14 +113,15 @@ warning.
 The app checks for updates on launch (`src/hooks/useUpdater.ts`) against:
 
 ```
-https://github.com/dennisrongo/health-tracker/releases/latest/download/latest.json
+https://github.com/dennisrongo/step-wise/releases/latest/download/latest.json
 ```
 
 The update payload is signed with the **updater key** (separate from the Apple
 cert) generated once via `npx tauri signer generate`. The public half lives in
 `src-tauri/tauri.conf.json` → `plugins.updater.pubkey`; the private half is set
-at build time via `TAURI_SIGNING_PRIVATE_KEY_PATH` in `.env`. **Back this key
-up** — losing it means existing installs can never auto-update again.
+at build time via `TAURI_SIGNING_PRIVATE_KEY` in `.env` (a path or the key
+contents — the build ignores the `*_PATH` variant). **Back this key up** — losing
+it means existing installs can never auto-update again.
 
 To ship an update:
 
@@ -160,7 +161,7 @@ The generated manifest looks like:
   "platforms": {
     "darwin-aarch64": {
       "signature": "<contents of the .app.tar.gz.sig>",
-      "url": "https://github.com/dennisrongo/health-tracker/releases/download/vX.Y.Z/Stepwise.app.tar.gz"
+      "url": "https://github.com/dennisrongo/step-wise/releases/download/vX.Y.Z/Stepwise.app.tar.gz"
     },
     "darwin-x86_64": {
       "signature": "<same .sig>",
@@ -230,7 +231,7 @@ auto-update payload with the **same** Tauri updater key, and merges a
 5. Commit + push `updater/latest.json` (signed commit — see below).
 6. Verify the endpoint serves all three platforms:
    ```bash
-   curl -sL https://github.com/dennisrongo/health-tracker/releases/latest/download/latest.json \
+   curl -sL https://github.com/dennisrongo/step-wise/releases/latest/download/latest.json \
      | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['version'],sorted(d['platforms']))"
    ```
    Expect `['darwin-aarch64','darwin-x86_64','windows-x86_64']`.
@@ -286,5 +287,5 @@ own web-flow key automatically.
 | `errSecInternalComponent` during signing | Keychain locked — `security unlock-keychain login.keychain`, or approve the GUI prompt. |
 | Notarization stuck `In Progress` | Apple's queue; `notarytool` polls until done. Check `xcrun notarytool history` with your creds. |
 | App opens but quits immediately on another Mac | Almost always missing notarization/staple, or an entitlement the binary actually needs — read the notary log: `xcrun notarytool log <submission-id>`. |
-| Build fails: *signing private key not set* | `createUpdaterArtifacts` is on, so a build needs `TAURI_SIGNING_PRIVATE_KEY_PATH` in `.env` (the updater key, not the Apple cert). |
+| Build fails: *signing private key not set* | `createUpdaterArtifacts` is on, so a build needs `TAURI_SIGNING_PRIVATE_KEY` in `.env` (the updater key, not the Apple cert). |
 | Update banner never appears | `latest.json` `version` must be **newer** than the installed app, and its `signature` must be the exact contents of the matching `.sig`. |

@@ -77,18 +77,24 @@ fn build_hover_window(app: &AppHandle) -> tauri::Result<()> {
     if app.get_webview_window(HOVER_LABEL).is_some() {
         return Ok(());
     }
-    WebviewWindowBuilder::new(app, HOVER_LABEL, WebviewUrl::App("index.html".into()))
+    let builder = WebviewWindowBuilder::new(app, HOVER_LABEL, WebviewUrl::App("index.html".into()))
         .title("Stepwise")
         .inner_size(HOVER_WIDTH, 200.0)
         .resizable(false)
         .decorations(false)
-        .transparent(true)
         .always_on_top(true)
         .skip_taskbar(true)
-        .shadow(false)
         .focused(false)
-        .visible(false)
-        .build()?;
+        .visible(false);
+    // Windows: an opaque window gets a real OS drop-shadow; a transparent
+    // borderless WebView2 window has none and shows a dead margin. macOS keeps
+    // the transparent floating-popover look (its CSS paints the shadow into the
+    // 10px margin). Mirrors the place_window cfg-branch below.
+    #[cfg(target_os = "windows")]
+    let builder = builder.transparent(false).shadow(true);
+    #[cfg(not(target_os = "windows"))]
+    let builder = builder.transparent(true).shadow(false);
+    builder.build()?;
     Ok(())
 }
 

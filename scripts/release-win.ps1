@@ -304,7 +304,7 @@ if ($fails -gt 0) {
 $Version = (Get-Content 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json).version
 $Tag = "v$Version"
 $Repo = (gh repo view --json nameWithOwner -q .nameWithOwner 2>$null)
-if (-not $Repo) { $Repo = 'dennisrongo/health-tracker' }
+if (-not $Repo) { $Repo = 'dennisrongo/step-wise' }
 $ManifestPath = 'updater/latest.json'
 
 Write-Host ''

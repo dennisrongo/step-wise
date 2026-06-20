@@ -8,6 +8,8 @@ src-tauri/target/
 .env.*
 !.env.example
 .gh-tokens.json
+# updater signing keys live in ~/.tauri, but guard against a stray copy here
+*.key
 
 # WIP / editor artefacts that must never be committed
 *.backup

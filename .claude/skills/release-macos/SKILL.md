@@ -36,9 +36,9 @@ Do **not** trigger for a local dev build (`npm run tauri dev`, `cargo build`) â€
    ```
 7. **Verify externally** that the public endpoint serves the new version:
    ```bash
-   curl -sL https://github.com/dennisrongo/health-tracker/releases/latest/download/latest.json \
+   curl -sL https://github.com/dennisrongo/step-wise/releases/latest/download/latest.json \
      | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['version'],list(d['platforms']))"
-   curl -sL -o /dev/null -w "tar.gz %{http_code}\n" https://github.com/dennisrongo/health-tracker/releases/download/v<VERSION>/Stepwise.app.tar.gz
+   curl -sL -o /dev/null -w "tar.gz %{http_code}\n" https://github.com/dennisrongo/step-wise/releases/download/v<VERSION>/Stepwise.app.tar.gz
    ```
    Expect the new version, both `darwin-aarch64` + `darwin-x86_64` keys, and HTTP 200.
 8. **Report:** release URL, notarization status, the generated release notes, endpoint check, and that installed builds will catch the update on next launch. If a Windows build is wanted for this version, it follows via **`/release-windows`** (merges `windows-x86_64` into the same release).

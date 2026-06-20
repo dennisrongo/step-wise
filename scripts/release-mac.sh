@@ -111,7 +111,7 @@ DMG_FILE=$(ls -1 "$DMG_DIR"/*.dmg 2>/dev/null | head -1 || true)
 
 # Version is the source of truth in tauri.conf.json.
 VERSION=$(grep -m1 '"version"' src-tauri/tauri.conf.json | sed -E 's/.*"version" *: *"([^"]+)".*/\1/')
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "dennisrongo/health-tracker")
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "dennisrongo/step-wise")
 
 # Tracked, cross-machine source of truth (committed to git).
 MANIFEST="updater/latest.json"

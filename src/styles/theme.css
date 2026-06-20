@@ -73,3 +73,10 @@ body {
   user-select: none;
   cursor: default;
 }
+
+/* Windows: the window is opaque with a real OS drop-shadow (see
+   tauri.windows.conf.json + tray.rs), so the body matches the panel surface —
+   no transparent margin, and no white WebView2 flash on launch. */
+html.win body {
+  background: var(--p-bg);
+}
