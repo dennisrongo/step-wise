@@ -7,6 +7,11 @@ pub struct AppState {
     /// Demo mode (STEPWISE_DEMO=1) returns realistic placeholder data.
     pub demo: bool,
     pub syncing: bool,
+    /// Set when a stored refresh token failed to decrypt this session (so it was
+    /// cleared). Lets every fetch — not just the one that hit the failure first —
+    /// report `NeedsReconnect` instead of a generic "not connected", so concurrent
+    /// callers can't race into the wrong error. Reset on (dis)connect.
+    pub needs_reconnect: bool,
     pub http: reqwest::Client,
     pub client_id: Option<String>,
     pub client_secret: Option<String>,
@@ -18,6 +23,7 @@ impl AppState {
             settings,
             demo,
             syncing: false,
+            needs_reconnect: false,
             http: reqwest::Client::new(),
             // Runtime env wins (dev / `.env`); fall back to values baked in at
             // build time via `option_env!`, so distributed bundles — which inherit

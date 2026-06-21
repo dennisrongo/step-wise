@@ -91,4 +91,21 @@ mod tests {
         let b = encrypt("same").unwrap();
         assert_ne!(a.nonce, b.nonce, "each encryption must use a fresh nonce");
     }
+
+    #[test]
+    fn decrypt_fails_when_the_key_no_longer_matches() {
+        // Reproduces the machine-id-change scenario behind `aead::Error`: the key
+        // is derived from machine id + salt, so a secret whose salt no longer
+        // matches its ciphertext derives a *different* key and must fail to
+        // decrypt (rather than silently returning garbage). Swapping in another
+        // secret's salt is the same effect as the machine id changing under a
+        // fixed salt. This is the exact trigger for the clear-token-and-reconnect
+        // path in `commands::health::gather`.
+        let mut tampered = encrypt("1//refresh-token").expect("encrypt");
+        tampered.salt = encrypt("anything").expect("encrypt second").salt;
+        assert!(
+            matches!(decrypt(&tampered), Err(EncryptionError::Cipher(_))),
+            "a key mismatch must surface as a Cipher error"
+        );
+    }
 }

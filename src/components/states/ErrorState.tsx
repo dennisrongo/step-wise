@@ -55,6 +55,31 @@ export function ErrorState({
     );
   }
 
+  // The saved token can't be decrypted on this machine — typically after an
+  // update that changed the machine id (the wmic→registry switch on Windows) or
+  // moving to a new device. Retrying can never succeed (the key won't match), so
+  // the only action is a one-time reconnect; the backend has already cleared the
+  // dead token. Lead with reconnect and omit the dead-end "Try again".
+  if (error && error.includes("NEEDS_RECONNECT")) {
+    return (
+      <div className="sw-body">
+        <div className="sw-empty">
+          <div className="sw-empty-ico">
+            <WarningIcon />
+          </div>
+          <div className="sw-empty-title">Reconnect to continue</div>
+          <div className="sw-empty-body">
+            Your saved Google sign-in couldn't be read on this device — this can happen after an
+            update or when moving to a new machine. Reconnect once to refresh access.
+          </div>
+          <button className="sw-btn" onClick={onReconnect} disabled={busy}>
+            {busy ? "Opening…" : "Reconnect Google Health"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="sw-body">
       <div className="sw-empty">

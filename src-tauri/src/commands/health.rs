@@ -58,10 +58,35 @@ fn status_from(st: &AppState) -> SyncStatus {
 type Creds = (bool, reqwest::Client, Option<String>, Option<String>, Option<String>);
 
 // Lock, decrypt the refresh token, clone what we need, drop the guard.
-async fn gather(state: &State<'_, Mutex<AppState>>) -> Result<Creds, String> {
-    let st = state.lock().await;
-    let token = match &st.settings.google_refresh_token {
-        Some(secret) => Some(encryption::decrypt(secret).map_err(|e| e.to_string())?),
+async fn gather(app: &AppHandle, state: &State<'_, Mutex<AppState>>) -> Result<Creds, String> {
+    let mut st = state.lock().await;
+    // Clone the stored secret so the match scrutinee is owned — leaves `st` free
+    // to mutate inside the arms (the clone is three short base64 strings).
+    let token = match st.settings.google_refresh_token.clone() {
+        Some(secret) => match encryption::decrypt(&secret) {
+            Ok(t) => Some(t),
+            Err(e) => {
+                // The stored token can't be decrypted on this machine — almost
+                // always because the machine id changed (e.g. the Windows
+                // wmic→registry switch), so the AES-GCM key no longer matches.
+                // It's permanently unusable, so drop it: the app self-heals to
+                // the reconnect state, and we signal a one-time re-auth instead
+                // of looping on a "Try again" that can never succeed. The flag
+                // makes any concurrent caller report the same thing rather than
+                // racing into a generic "not connected". (`save` is synchronous,
+                // so the lock is never held across an await.)
+                tracing::warn!(
+                    "stored refresh token failed to decrypt ({e}); clearing it — reconnect required"
+                );
+                st.settings.google_refresh_token = None;
+                st.needs_reconnect = true;
+                let _ = st.settings.save(app);
+                return Err(HealthError::NeedsReconnect.to_string());
+            }
+        },
+        // No token: distinguish a never-connected account (genuine NotConnected,
+        // handled by `require`) from one whose token we just cleared this session.
+        None if st.needs_reconnect => return Err(HealthError::NeedsReconnect.to_string()),
         None => None,
     };
     Ok((
@@ -85,11 +110,12 @@ fn require(
 }
 
 async fn build_week(
+    app: &AppHandle,
     state: &State<'_, Mutex<AppState>>,
     active_mode: ActiveMode,
     goal: u64,
 ) -> Result<WeekSummary, String> {
-    let (demo, http, cid, csec, token) = gather(state).await?;
+    let (demo, http, cid, csec, token) = gather(app, state).await?;
     if demo {
         return Ok(health::demo::week(goal));
     }
@@ -112,11 +138,13 @@ pub async fn get_sync_status(state: State<'_, Mutex<AppState>>) -> Result<SyncSt
 
 #[tauri::command]
 pub async fn get_week_summary(
+    app: AppHandle,
     state: State<'_, Mutex<AppState>>,
     active_mode: Option<String>,
     goal: Option<u64>,
 ) -> Result<WeekSummary, String> {
     build_week(
+        &app,
         &state,
         ActiveMode::from_opt(active_mode.as_deref()),
         health::resolve_goal(goal),
@@ -126,12 +154,14 @@ pub async fn get_week_summary(
 
 #[tauri::command]
 pub async fn get_day_summary(
+    app: AppHandle,
     state: State<'_, Mutex<AppState>>,
     date: Option<String>,
     active_mode: Option<String>,
     goal: Option<u64>,
 ) -> Result<DaySummary, String> {
     let week = build_week(
+        &app,
         &state,
         ActiveMode::from_opt(active_mode.as_deref()),
         health::resolve_goal(goal),
@@ -188,6 +218,7 @@ pub async fn connect_google_health(
         let mut st = state.lock().await;
         st.settings.google_refresh_token = Some(encrypted);
         st.settings.last_synced_at = Some(now);
+        st.needs_reconnect = false;
         st.settings.save(&app).map_err(|e| e.to_string())?;
     }
 
@@ -202,6 +233,7 @@ pub async fn disconnect(
 ) -> Result<SyncStatus, String> {
     let mut st = state.lock().await;
     st.settings.google_refresh_token = None;
+    st.needs_reconnect = false;
     st.settings.save(&app).map_err(|e| e.to_string())?;
     Ok(status_from(&st))
 }
@@ -228,6 +260,7 @@ pub async fn refresh_now(
         state.lock().await.syncing = true;
     }
     let result = build_week(
+        &app,
         &state,
         ActiveMode::from_opt(active_mode.as_deref()),
         health::resolve_goal(goal),

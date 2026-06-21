@@ -46,6 +46,17 @@ fn demo_week_uses_the_provided_goal() {
 }
 
 #[test]
+fn needs_reconnect_error_carries_the_stable_frontend_token() {
+    // ErrorState.tsx keys on this exact substring to show the guided reconnect
+    // screen (matching the ACCOUNT_NOT_LINKED convention). Keep them in lockstep.
+    let msg = health::HealthError::NeedsReconnect.to_string();
+    assert!(
+        msg.contains("NEEDS_RECONNECT"),
+        "frontend matches on this token: {msg}"
+    );
+}
+
+#[test]
 fn resolve_goal_defaults_and_clamps() {
     // Unset → conventional default.
     assert_eq!(health::resolve_goal(None), health::DEFAULT_GOAL);

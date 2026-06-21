@@ -100,6 +100,14 @@ pub struct SyncStatus {
 pub enum HealthError {
     #[error("not connected to Google Health")]
     NotConnected,
+    /// The stored refresh token can't be decrypted on this machine — almost
+    /// always because the machine id changed (e.g. the Windows wmic→registry
+    /// switch), so the AES-256-GCM key no longer matches. The token is
+    /// permanently unusable, so it's cleared and the user must reconnect once.
+    /// The stable `NEEDS_RECONNECT` token lets the frontend show a guided
+    /// reconnect state instead of a cryptic cipher error with a dead-end retry.
+    #[error("NEEDS_RECONNECT — your saved Google sign-in couldn't be read on this device; reconnect to continue")]
+    NeedsReconnect,
     /// The OAuth grant is valid, but the account has no Google Health profile
     /// yet (FAILED_PRECONDITION / ACCOUNT_NOT_LINKED). Actionable: the user must
     /// finish setup at `signup_url`. The stable `ACCOUNT_NOT_LINKED` token lets
