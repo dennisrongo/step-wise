@@ -175,6 +175,28 @@ export function useHealth(): HealthApi {
     return () => clearInterval(timer);
   }, [refreshQuiet]);
 
+  // Refresh the instant the panel regains focus (or the tab becomes visible),
+  // independent of the interval above. WebView2/Chromium throttles background
+  // timers — a persistent panel left open behind another window has its 15s
+  // tick clamped (down to ~1/min after a few minutes), so the numbers can sit
+  // stale until you look back at it. This makes them current the moment you do.
+  // No value is computed here — it just calls the same fetch sooner.
+  useEffect(() => {
+    if (!isTauriReady()) {
+      const onVis = () => {
+        if (document.visibilityState === "visible") void refreshQuiet();
+      };
+      document.addEventListener("visibilitychange", onVis);
+      return () => document.removeEventListener("visibilitychange", onVis);
+    }
+    const un = getCurrentWindow().onFocusChanged(({ payload: focused }) => {
+      if (focused) void refreshQuiet();
+    });
+    return () => {
+      void un.then((f) => f());
+    };
+  }, [refreshQuiet]);
+
   const selectedDay = week && week.days[selected] ? week.days[selected] : null;
 
   return {
