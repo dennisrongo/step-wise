@@ -112,6 +112,12 @@ fn toggle_main(app: &AppHandle, rect: Option<Rect>) {
     // re-assert so the panel lands on the display whose menu bar was clicked.
     position(&win, rect);
     let _ = win.set_focus();
+    // Signal the frontend that the panel was genuinely opened (not merely
+    // re-focused by a stray click). The frontend uses this to replay the
+    // entrance animation + count-up exactly once per open, instead of keying
+    // off focus events — which fire on every click on Windows and re-triggered
+    // the whole dashboard's mount animation.
+    let _ = app.emit("panel-opened", ());
 }
 
 fn show_hover(app: &AppHandle, rect: Rect) {

@@ -9,7 +9,7 @@ pub mod state;
 pub mod storage;
 pub mod tray;
 
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 use tokio::sync::Mutex;
 
 use state::AppState;
@@ -26,6 +26,9 @@ pub fn run() {
             if let Some(win) = app.get_webview_window("main") {
                 let _ = win.show();
                 let _ = win.set_focus();
+                // A second launch surfacing the existing panel is a genuine
+                // open — replay the entrance animation, just like the tray.
+                let _ = app.emit("panel-opened", ());
             }
         }))
         .plugin(tauri_plugin_opener::init())
