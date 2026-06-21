@@ -17,7 +17,7 @@
 
 ## What it does
 
-- **Step ring** — today's count against a 10,000-step goal, with "1,573 to go".
+- **Step ring** — today's count against your daily step goal (10,000 by default, adjustable in Settings), with "1,573 to go".
 - **Shape of the day** — slim hourly bars from midnight to now; the current hour is highlighted.
 - **Four metrics** — resting HR, sleep, distance, and active minutes, each with a tiny up/down trend vs. yesterday.
 - **Last 7 days** — a mini bar strip; click any day to swap the hero + cards to that day.

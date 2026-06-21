@@ -31,6 +31,7 @@ export default function App() {
     connect,
     disconnect,
     refreshNow,
+    applyGoal,
   } = useHealth();
 
   const [showSettings, setShowSettings] = useState(false);
@@ -56,6 +57,7 @@ export default function App() {
           onReconnect={connect}
           onDisconnect={disconnect}
           onActiveModeChange={refreshNow}
+          onGoalChange={applyGoal}
         />
       </Panel>
     );

@@ -2,7 +2,7 @@ use stepwise_lib::health;
 
 #[test]
 fn demo_week_has_seven_days_with_today_last() {
-    let week = health::demo::week();
+    let week = health::demo::week(health::DEFAULT_GOAL);
     assert_eq!(week.days.len(), 7);
     assert!(week.days.last().unwrap().is_today);
     assert!(week.days.iter().take(6).all(|d| !d.is_today));
@@ -10,7 +10,7 @@ fn demo_week_has_seven_days_with_today_last() {
 
 #[test]
 fn demo_today_matches_the_design() {
-    let week = health::demo::week();
+    let week = health::demo::week(health::DEFAULT_GOAL);
     let today = week.days.last().unwrap();
     assert_eq!(today.steps, 8_427);
     assert_eq!(today.goal, 10_000);
@@ -20,7 +20,7 @@ fn demo_today_matches_the_design() {
 
 #[test]
 fn deltas_are_relative_to_the_previous_day() {
-    let week = health::demo::week();
+    let week = health::demo::week(health::DEFAULT_GOAL);
     assert!(
         week.days[0].resting_hr_delta.is_none(),
         "first day has no previous day"
@@ -33,8 +33,25 @@ fn deltas_are_relative_to_the_previous_day() {
 
 #[test]
 fn labels_are_two_letter_weekdays() {
-    let week = health::demo::week();
+    let week = health::demo::week(health::DEFAULT_GOAL);
     for day in &week.days {
         assert_eq!(day.label.chars().count(), 2, "label should be 2 letters");
     }
+}
+
+#[test]
+fn demo_week_uses_the_provided_goal() {
+    let week = health::demo::week(12_500);
+    assert!(week.days.iter().all(|d| d.goal == 12_500));
+}
+
+#[test]
+fn resolve_goal_defaults_and_clamps() {
+    // Unset → conventional default.
+    assert_eq!(health::resolve_goal(None), health::DEFAULT_GOAL);
+    // In-range value passes through untouched.
+    assert_eq!(health::resolve_goal(Some(12_500)), 12_500);
+    // Out-of-range values clamp into the supported window (no div-by-zero ring).
+    assert_eq!(health::resolve_goal(Some(0)), 1_000);
+    assert_eq!(health::resolve_goal(Some(999_999)), 100_000);
 }

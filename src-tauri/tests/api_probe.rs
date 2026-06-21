@@ -156,7 +156,7 @@ async fn probe_live_freshness() {
         let today = now.date_naive();
 
         // 1) The exact value our app would display, via our real code path.
-        let app_today = match health::google::fetch_week(&http, &cid, &csec, &refresh, ActiveMode::Full).await {
+        let app_today = match health::google::fetch_week(&http, &cid, &csec, &refresh, ActiveMode::Full, health::DEFAULT_GOAL).await {
             Ok(week) => week.days.iter().find(|d| d.is_today).map(|d| d.steps),
             Err(e) => {
                 println!("[{i}] fetch_week ERROR: {e}");

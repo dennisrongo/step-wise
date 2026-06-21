@@ -3,7 +3,7 @@
 // wiring Google.
 use chrono::{Duration, Local};
 
-use super::{fill_deltas, label_for, DaySummary, HourBucket, WeekSummary, GOAL};
+use super::{fill_deltas, label_for, DaySummary, HourBucket, WeekSummary};
 
 const CURRENT_HOUR: u32 = 14; // 2 PM
 
@@ -46,7 +46,7 @@ fn hourly(steps: u64, is_today: bool) -> Vec<HourBucket> {
         .collect()
 }
 
-pub fn week() -> WeekSummary {
+pub fn week(goal: u64) -> WeekSummary {
     let today = Local::now().date_naive();
     let mut days: Vec<DaySummary> = SEEDS
         .iter()
@@ -59,7 +59,7 @@ pub fn week() -> WeekSummary {
                 label: label_for(date),
                 is_today,
                 steps: s.steps,
-                goal: GOAL,
+                goal,
                 hourly: hourly(s.steps, is_today),
                 resting_hr: Some(s.hr),
                 sleep_minutes: Some(s.sleep),

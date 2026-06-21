@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { isTauriReady } from "../tauriReady";
 import { getActiveMode } from "../activeMode";
+import { getGoal } from "../goal";
 import { REFRESH_MS } from "../refreshInterval";
 import { DEMO_STATUS, DEMO_WEEK } from "../mockData";
 import type { DaySummary, RefreshResult, SyncStatus, WeekSummary } from "../types";
@@ -34,6 +35,11 @@ export interface HealthApi {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   refreshNow: () => Promise<void>;
+  /** Apply a new step goal to the already-loaded week in place. The goal is a
+   * client-side threshold (the backend just stamps it), so there's nothing new
+   * to fetch — restamping locally updates the ring instantly and avoids a
+   * needless Google round-trip on every stepper click. */
+  applyGoal: (goal: number) => void;
 }
 
 export function useHealth(): HealthApi {
@@ -54,6 +60,7 @@ export function useHealth(): HealthApi {
     try {
       const w = await call<WeekSummary>("get_week_summary", DEMO_WEEK, {
         activeMode: getActiveMode(),
+        goal: getGoal(),
       });
       applyWeek(w);
     } catch (e) {
@@ -113,7 +120,7 @@ export function useHealth(): HealthApi {
     setError(null);
     try {
       const r = isTauriReady()
-        ? await invoke<RefreshResult>("refresh_now", { activeMode: getActiveMode() })
+        ? await invoke<RefreshResult>("refresh_now", { activeMode: getActiveMode(), goal: getGoal() })
         : DEMO_REFRESH;
       applyRefresh(r);
     } catch (e) {
@@ -133,7 +140,7 @@ export function useHealth(): HealthApi {
     quietBusy.current = true;
     try {
       const r = isTauriReady()
-        ? await invoke<RefreshResult>("refresh_now", { activeMode: getActiveMode() })
+        ? await invoke<RefreshResult>("refresh_now", { activeMode: getActiveMode(), goal: getGoal() })
         : DEMO_REFRESH;
       applyRefresh(r);
     } catch {
@@ -197,6 +204,12 @@ export function useHealth(): HealthApi {
     };
   }, [refreshQuiet]);
 
+  const applyGoal = useCallback((goal: number) => {
+    setWeek((w) =>
+      w ? { days: w.days.map((d) => (d.goal === goal ? d : { ...d, goal })) } : w,
+    );
+  }, []);
+
   const selectedDay = week && week.days[selected] ? week.days[selected] : null;
 
   return {
@@ -210,5 +223,6 @@ export function useHealth(): HealthApi {
     connect,
     disconnect,
     refreshNow,
+    applyGoal,
   };
 }

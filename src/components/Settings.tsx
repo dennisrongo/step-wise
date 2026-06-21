@@ -5,7 +5,9 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { isTauriReady } from "../tauriReady";
 import { getThemeMode, setThemeMode, type ThemeMode } from "../theme";
 import { getActiveMode, setActiveMode, type ActiveMode } from "../activeMode";
+import { clampGoal, getGoal, setGoal, GOAL_STEP, MIN_GOAL, MAX_GOAL } from "../goal";
 import { useUpdater } from "../hooks/useUpdater";
+import { nf } from "../format";
 import type { SyncStatus } from "../types";
 
 const TILES: { mode: ThemeMode; label: string; cls: string }[] = [
@@ -47,6 +49,7 @@ export function Settings({
   onReconnect,
   onDisconnect,
   onActiveModeChange,
+  onGoalChange,
 }: {
   status: SyncStatus;
   onBack: () => void;
@@ -54,9 +57,13 @@ export function Settings({
   onDisconnect: () => void;
   /** Called after the active-minutes preference changes, to re-fetch the week. */
   onActiveModeChange?: () => void;
+  /** Called after the step goal changes, with the new goal, to apply it to the
+   * loaded week (no re-fetch needed — the goal is a client-side threshold). */
+  onGoalChange?: (goal: number) => void;
 }) {
   const [mode, setMode] = useState<ThemeMode>(getThemeMode());
   const [activeMode, setActiveModeState] = useState<ActiveMode>(getActiveMode());
+  const [goal, setGoalState] = useState<number>(getGoal());
   const [version, setVersion] = useState("0.1.0");
   const upd = useUpdater({ auto: false });
 
@@ -76,6 +83,13 @@ export function Settings({
     setActiveMode(m);
     setActiveModeState(m);
     onActiveModeChange?.();
+  };
+  const bumpGoal = (delta: number) => {
+    const next = clampGoal(goal + delta);
+    if (next === goal) return;
+    setGoal(next);
+    setGoalState(next);
+    onGoalChange?.(next);
   };
   const connected = status.connected;
 
@@ -132,6 +146,40 @@ export function Settings({
               ))}
             </div>
             <div className="ap-help">Match your Mac's appearance, or force a mode.</div>
+          </div>
+        </div>
+
+        <div className="set-section">
+          <div className="set-label">Daily step goal</div>
+          <div className="set-card gl-card">
+            <div className="gl-stepper" role="group" aria-label="Daily step goal">
+              <button
+                type="button"
+                className="gl-btn"
+                onClick={() => bumpGoal(-GOAL_STEP)}
+                disabled={goal <= MIN_GOAL}
+                aria-label={`Decrease goal by ${GOAL_STEP} steps`}
+              >
+                &#8722;
+              </button>
+              {/* aria-live so screen readers announce the new value when the
+                  buttons change it (the buttons themselves only say "Decrease/
+                  Increase"); aria-atomic so it reads as one "N steps" unit. */}
+              <div className="gl-val" aria-live="polite" aria-atomic="true">
+                {nf(goal)}
+                <span className="gl-unit">steps</span>
+              </div>
+              <button
+                type="button"
+                className="gl-btn"
+                onClick={() => bumpGoal(GOAL_STEP)}
+                disabled={goal >= MAX_GOAL}
+                aria-label={`Increase goal by ${GOAL_STEP} steps`}
+              >
+                +
+              </button>
+            </div>
+            <div className="ap-help">The target your step ring fills toward. Default is 10,000.</div>
           </div>
         </div>
 

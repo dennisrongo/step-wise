@@ -6,7 +6,22 @@ pub mod google;
 use chrono::{Datelike, NaiveDate, Weekday};
 use serde::Serialize;
 
-pub const GOAL: u64 = 10_000;
+/// The daily step goal used when the user hasn't chosen one. The Google Health
+/// API has no goal/target data type, so the goal is a local preference (like
+/// theme / active mode) passed in at fetch time — 10,000 is the conventional
+/// default we fall back to.
+pub const DEFAULT_GOAL: u64 = 10_000;
+/// Clamp bounds for a user-chosen goal: keeps the ring math (steps / goal) from
+/// dividing by zero or going absurd. Must stay in sync with the frontend bounds
+/// in `src/goal.ts` (which snaps + clamps before sending) — change both together.
+const MIN_GOAL: u64 = 1_000;
+const MAX_GOAL: u64 = 100_000;
+
+/// Resolve the effective step goal: fall back to [`DEFAULT_GOAL`] when unset, and
+/// clamp any chosen value into the supported range.
+pub fn resolve_goal(goal: Option<u64>) -> u64 {
+    goal.unwrap_or(DEFAULT_GOAL).clamp(MIN_GOAL, MAX_GOAL)
+}
 
 /// Which activity levels count toward the "active minutes" metric. `Full` counts
 /// light + moderate + vigorous (the default); `ModerateVigorous` excludes light.

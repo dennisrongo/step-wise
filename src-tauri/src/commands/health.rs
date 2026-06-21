@@ -87,13 +87,14 @@ fn require(
 async fn build_week(
     state: &State<'_, Mutex<AppState>>,
     active_mode: ActiveMode,
+    goal: u64,
 ) -> Result<WeekSummary, String> {
     let (demo, http, cid, csec, token) = gather(state).await?;
     if demo {
-        return Ok(health::demo::week());
+        return Ok(health::demo::week(goal));
     }
     let (cid, csec, token) = require(cid, csec, token)?;
-    health::google::fetch_week(&http, &cid, &csec, &token, active_mode)
+    health::google::fetch_week(&http, &cid, &csec, &token, active_mode, goal)
         .await
         .map_err(|e| {
             // Surface the real reason in the console: this is what otherwise turns
@@ -113,8 +114,14 @@ pub async fn get_sync_status(state: State<'_, Mutex<AppState>>) -> Result<SyncSt
 pub async fn get_week_summary(
     state: State<'_, Mutex<AppState>>,
     active_mode: Option<String>,
+    goal: Option<u64>,
 ) -> Result<WeekSummary, String> {
-    build_week(&state, ActiveMode::from_opt(active_mode.as_deref())).await
+    build_week(
+        &state,
+        ActiveMode::from_opt(active_mode.as_deref()),
+        health::resolve_goal(goal),
+    )
+    .await
 }
 
 #[tauri::command]
@@ -122,8 +129,14 @@ pub async fn get_day_summary(
     state: State<'_, Mutex<AppState>>,
     date: Option<String>,
     active_mode: Option<String>,
+    goal: Option<u64>,
 ) -> Result<DaySummary, String> {
-    let week = build_week(&state, ActiveMode::from_opt(active_mode.as_deref())).await?;
+    let week = build_week(
+        &state,
+        ActiveMode::from_opt(active_mode.as_deref()),
+        health::resolve_goal(goal),
+    )
+    .await?;
     let day = match date {
         Some(d) => week.days.into_iter().find(|x| x.date == d),
         None => week.days.into_iter().find(|x| x.is_today),
@@ -209,11 +222,17 @@ pub async fn refresh_now(
     app: AppHandle,
     state: State<'_, Mutex<AppState>>,
     active_mode: Option<String>,
+    goal: Option<u64>,
 ) -> Result<RefreshResult, String> {
     {
         state.lock().await.syncing = true;
     }
-    let result = build_week(&state, ActiveMode::from_opt(active_mode.as_deref())).await;
+    let result = build_week(
+        &state,
+        ActiveMode::from_opt(active_mode.as_deref()),
+        health::resolve_goal(goal),
+    )
+    .await;
     let now = Utc::now().to_rfc3339();
 
     let mut st = state.lock().await;

@@ -10,7 +10,7 @@ use chrono::{DateTime, Datelike, Duration, FixedOffset, Local, NaiveDate, Timeli
 use serde_json::{json, Value};
 
 use super::{
-    fill_deltas, label_for, ActiveMode, DaySummary, HealthError, HourBucket, WeekSummary, GOAL,
+    fill_deltas, label_for, ActiveMode, DaySummary, HealthError, HourBucket, WeekSummary,
 };
 use crate::oauth;
 
@@ -29,6 +29,7 @@ pub async fn fetch_week(
     client_secret: &str,
     refresh_token: &str,
     active_mode: ActiveMode,
+    goal: u64,
 ) -> Result<WeekSummary, HealthError> {
     let token = oauth::refresh(http, client_id, client_secret, refresh_token)
         .await?
@@ -75,7 +76,7 @@ pub async fn fetch_week(
             label: label_for(date),
             is_today,
             steps,
-            goal: GOAL,
+            goal,
             hourly,
             resting_hr: resting_hr.get(&date).copied(),
             sleep_minutes: sleep.get(&date).copied(),

@@ -1,9 +1,10 @@
 // Realistic placeholder data used for browser previews (no Tauri) and mirrored
 // by the Rust DemoSource so the "Connected" design looks identical either way.
 import type { DaySummary, HourBucket, SyncStatus, WeekSummary } from "./types";
+import { getGoal } from "./goal";
 
 const CURRENT_HOUR = 14; // 2 PM
-const GOAL = 10000;
+const GOAL = getGoal();
 
 // Shape of an active day (relative weight per hour, 0..23).
 const BASE_HOURLY = [

@@ -7,6 +7,7 @@ import { isTauriReady } from "../tauriReady";
 import { fitWindowHeight } from "../platform";
 import { REFRESH_MS } from "../refreshInterval";
 import { DEMO_STATUS, DEMO_WEEK } from "../mockData";
+import { getGoal } from "../goal";
 import { nf, toGo } from "../format";
 import type { DaySummary, SyncStatus, WeekSummary } from "../types";
 
@@ -14,9 +15,9 @@ import type { DaySummary, SyncStatus, WeekSummary } from "../types";
 // the tray icon, so the width stays fixed while we fit the height here.
 const WIDTH = 320;
 
-async function call<T>(command: string, fallback: T): Promise<T> {
+async function call<T>(command: string, fallback: T, args?: Record<string, unknown>): Promise<T> {
   if (!isTauriReady()) return fallback;
-  return invoke<T>(command);
+  return invoke<T>(command, args);
 }
 
 /**
@@ -39,7 +40,7 @@ export function HoverPopover() {
         setToday(null);
         return;
       }
-      const w = await call<WeekSummary>("get_week_summary", DEMO_WEEK);
+      const w = await call<WeekSummary>("get_week_summary", DEMO_WEEK, { goal: getGoal() });
       setToday(w.days.find((d) => d.isToday) ?? w.days[w.days.length - 1] ?? null);
     } catch {
       /* keep last good values */
