@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — Stepwise</title>
+  <meta name="description" content="How Stepwise accesses, uses, and protects your Google Health data." />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="assets/logo.svg" alt="" /> Stepwise</a>
+      <nav><a href="./">Home</a><a href="terms.html">Terms</a></nav>
+    </div>
+  </header>
+
+  <article class="legal">
+    <a class="back" href="./">← Back to Stepwise</a>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: June 20, 2026</p>
+
+    <p>
+      Stepwise (“the app”, “we”, “our”) is a desktop menu-bar application that displays
+      your own health and activity data. This policy explains exactly what data the app
+      accesses, how it is used, and how it is protected. Stepwise is privacy-first by
+      design: your data is read with read-only permission, processed entirely on your
+      own device, and never sent to us or any third party.
+    </p>
+
+    <h2>Who we are</h2>
+    <p>
+      Stepwise is developed by Dennis Rongo. For any privacy questions, contact
+      <a href="mailto:contact@leancodeautomation.com">contact@leancodeautomation.com</a>.
+    </p>
+
+    <h2>What data we access</h2>
+    <p>
+      When you choose to connect your Google Account, Stepwise requests the following
+      <strong>read-only</strong> scopes from the Google Health API. You actively grant
+      these during sign-in and can revoke them at any time (see “Your choices”).
+    </p>
+    <ul>
+      <li>
+        <strong>Activity &amp; fitness</strong>
+        (<code>googlehealth.activity_and_fitness.readonly</code>) — daily and hourly
+        steps, distance, and active minutes.
+      </li>
+      <li>
+        <strong>Health metrics &amp; measurements</strong>
+        (<code>googlehealth.health_metrics_and_measurements.readonly</code>) — resting
+        heart rate.
+      </li>
+      <li>
+        <strong>Sleep</strong>
+        (<code>googlehealth.sleep.readonly</code>) — sleep duration.
+      </li>
+    </ul>
+    <p>
+      These scopes are <em>read-only</em>. Stepwise cannot create, modify, or delete any
+      data in your Google Account.
+    </p>
+
+    <h2>How we use the data</h2>
+    <p>
+      The data is used for a single purpose: to display your steps, the shape of your
+      day, your recent week, and the four supporting metrics inside the app's menu-bar
+      panel on your device. It is fetched on demand, held in memory only while the app
+      renders it, and used for no other purpose.
+    </p>
+
+    <h2>Where the data goes</h2>
+    <ul>
+      <li>
+        <strong>Directly from Google to your device.</strong> The app talks to Google's
+        servers from your own computer. Your health data is never routed through, copied
+        to, or stored on any server operated by us — we operate no servers at all.
+      </li>
+      <li>
+        <strong>We do not collect or store your health data.</strong> There is no
+        backend, no database, and no analytics. We never see your numbers.
+      </li>
+      <li>
+        <strong>No sharing or selling.</strong> Your data is never sold, rented, shared,
+        or transferred to any third party, advertiser, or data broker.
+      </li>
+      <li>
+        <strong>No advertising or profiling.</strong> The app contains no ads and builds
+        no profile of you.
+      </li>
+    </ul>
+
+    <h2>What is stored, and how it's protected</h2>
+    <p>
+      The only credential persisted on your device is the OAuth <strong>refresh
+      token</strong> Google issues when you connect. It is stored locally, encrypted with
+      <strong>AES-256-GCM</strong> using a key derived via Argon2id and bound to your
+      machine's identity. It is never written in plaintext and never leaves your device.
+      Sign-in uses a desktop loopback + PKCE flow, so no client secret is exposed in the
+      browser. App settings (such as your goal and theme) are stored as plain local
+      configuration in your operating system's application-data directory.
+    </p>
+
+    <div class="callout">
+      <p>
+        <strong>Limited Use disclosure.</strong> Stepwise's use and transfer of
+        information received from Google APIs adheres to the
+        <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>,
+        including the Limited Use requirements. We only use Google user data to provide
+        and improve the in-app features described above, do not transfer it to others
+        except as necessary to provide those features (and never for advertising,
+        profiling, or sale), and do not allow humans to read the data unless we have your
+        consent for specific support, it is required for security or legal reasons, or
+        the data has been aggregated and anonymized.
+      </p>
+    </div>
+
+    <h2>Data retention and deletion</h2>
+    <p>
+      Because health data is not stored by the app beyond display, there is nothing for
+      us to retain or delete. The locally stored refresh token is removed when you
+      disconnect your account in the app or uninstall Stepwise. You can also revoke
+      Stepwise's access at any time from your Google Account
+      (<a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>),
+      which immediately invalidates the token.
+    </p>
+
+    <h2>Your choices</h2>
+    <ul>
+      <li>Connecting your Google Account is entirely optional — the app offers a demo mode with placeholder data.</li>
+      <li>Disconnect inside the app to remove the stored token from your device.</li>
+      <li>Revoke access from your <a href="https://myaccount.google.com/permissions">Google Account permissions</a> page at any time.</li>
+    </ul>
+
+    <h2>Children's privacy</h2>
+    <p>Stepwise is not directed to children under 13 and does not knowingly collect data from them.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>
+      We may update this policy as the app evolves. Material changes will be reflected on
+      this page with a new “Last updated” date.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy or your data? Email
+      <a href="mailto:contact@leancodeautomation.com">contact@leancodeautomation.com</a>.
+    </p>
+  </article>
+
+  <footer>
+    <div class="wrap">
+      <span>© 2026 Dennis Rongo. Stepwise.</span>
+      <nav>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="https://github.com/dennisrongo/step-wise">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

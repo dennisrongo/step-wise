@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stepwise — a calm menu-bar health dashboard</title>
+  <meta name="description" content="Stepwise is a calm, glanceable menu-bar health dashboard for macOS, Windows, and Linux. Today's steps, the shape of your day, and the last week — read from your Pixel via Google Health." />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/site.css" />
+  <meta property="og:title" content="Stepwise" />
+  <meta property="og:description" content="A calm, glanceable menu-bar health dashboard. Read from your Pixel via Google Health." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="screenshots/dashboard.png" />
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap">
+      <a class="brand" href="./">
+        <img src="assets/logo.svg" alt="" />
+        Stepwise
+      </a>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/dennisrongo/step-wise">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <img class="logo" src="assets/logo.svg" alt="Stepwise app icon" />
+        <h1>Your day, at a glance.</h1>
+        <p class="lede">
+          A calm, glanceable menu-bar health dashboard. Today's steps, the shape of
+          your day, and the last week — read from your Pixel via Google Health.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://github.com/dennisrongo/step-wise/releases">Download</a>
+          <a class="btn btn-ghost" href="https://github.com/dennisrongo/step-wise">View on GitHub</a>
+        </div>
+        <img class="shot" src="screenshots/dashboard.png" alt="Stepwise dashboard in light and dark mode" />
+      </div>
+    </section>
+
+    <section id="features" class="alt">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Honest about your numbers.</h2>
+          <p>
+            The counts reflect your phone's last cloud sync — never a faked, ticking
+            counter. Quiet by design, accurate by default.
+          </p>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div class="ic">🥾</div>
+            <h3>Step ring</h3>
+            <p>Today's count against your goal, with how many steps you have left to go.</p>
+          </div>
+          <div class="card">
+            <div class="ic">📊</div>
+            <h3>Shape of the day</h3>
+            <p>Slim hourly bars from midnight to now, with the current hour highlighted.</p>
+          </div>
+          <div class="card">
+            <div class="ic">❤️</div>
+            <h3>Four metrics</h3>
+            <p>Resting heart rate, sleep, distance, and active minutes — each with a trend vs. yesterday.</p>
+          </div>
+          <div class="card">
+            <div class="ic">🗓️</div>
+            <h3>Last 7 days</h3>
+            <p>A mini bar strip; click any day to swap the dashboard to that day.</p>
+          </div>
+          <div class="card">
+            <div class="ic">🌗</div>
+            <h3>Light &amp; dark</h3>
+            <p>Follows your system automatically, or lock a mode in Settings.</p>
+          </div>
+          <div class="card">
+            <div class="ic">🔄</div>
+            <h3>Auto-updates</h3>
+            <p>Signed, in-app updates so you're always on the latest build.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Your data stays yours.</h2>
+          <p>Stepwise reads your activity with read-only access and keeps it on your device. No servers, no analytics, no selling.</p>
+        </div>
+        <div class="assure">
+          <div class="item">
+            <span class="dot">●</span>
+            <div>
+              <strong>Read-only access</strong>
+              <span>Stepwise can only read your activity, heart rate, and sleep — it can never change or delete anything.</span>
+            </div>
+          </div>
+          <div class="item">
+            <span class="dot">●</span>
+            <div>
+              <strong>Stored on your machine</strong>
+              <span>Your refresh token is encrypted with AES-256-GCM, bound to your device. No plaintext, no cloud.</span>
+            </div>
+          </div>
+          <div class="item">
+            <span class="dot">●</span>
+            <div>
+              <strong>No third parties</strong>
+              <span>Data flows from Google straight to your device. We don't collect, transmit, or sell any of it.</span>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center; margin-top:36px;">
+          <a href="privacy.html">Read the full privacy policy</a> · <a href="terms.html">Terms of Service</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© 2026 Dennis Rongo. Stepwise.</span>
+      <nav>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="https://github.com/dennisrongo/step-wise">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
