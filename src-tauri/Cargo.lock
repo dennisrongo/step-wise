@@ -3857,6 +3857,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "url",
+ "winreg",
 ]
 
 [[package]]

@@ -47,6 +47,9 @@ argon2 = "0.5"
 [target.'cfg(target_os = "macos")'.dependencies]
 embed_plist = "1"
 
+[target.'cfg(target_os = "windows")'.dependencies]
+winreg = "0.55"
+
 [dev-dependencies]
 tempfile = "3"
 

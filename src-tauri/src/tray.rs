@@ -5,9 +5,12 @@
 use tauri::{
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Emitter, LogicalPosition, Manager, PhysicalPosition, PhysicalSize, Rect, WebviewUrl,
+    AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize, Rect, WebviewUrl,
     WebviewWindow, WebviewWindowBuilder,
 };
+// Only the non-Windows window placement uses logical points.
+#[cfg(not(target_os = "windows"))]
+use tauri::LogicalPosition;
 
 const TRAY_ID: &str = "stepwise-tray";
 
