@@ -47,6 +47,18 @@ if [[ -z "${APPLE_API_KEY:-}" && ( -z "${APPLE_ID:-}" || -z "${APPLE_PASSWORD:-}
   echo "         The DMG will trigger Gatekeeper warnings on other Macs." >&2
 fi
 
+# Google OAuth creds are baked into the binary at compile time via option_env!
+# (src-tauri/src/state/mod.rs). A distributable built without them silently ships
+# an app that can't reach Google ("Stepwise is connected to Google, but the
+# request for your activity failed"). Require them up front so we fail in 1s
+# instead of after a full build + notarization.
+if [[ -z "${GOOGLE_CLIENT_ID:-}" || -z "${GOOGLE_CLIENT_SECRET:-}" ]]; then
+  echo "error: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are not set." >&2
+  echo "       They are compiled into the binary; a build without them ships an" >&2
+  echo "       app that can't reach Google. Set them in .env (see .env.example)." >&2
+  exit 1
+fi
+
 # Universal (Intel + Apple Silicon) by default. Set TARGET=aarch64-apple-darwin
 # (or x86_64-apple-darwin) to build host-native / single-arch instead.
 TARGET="${TARGET:-universal-apple-darwin}"
@@ -78,6 +90,20 @@ npx tauri build --target "$TARGET" --bundles app,dmg
 # Bundles live under target/<triple>/release when --target is passed.
 APP="src-tauri/target/${TARGET}/release/bundle/macos/Stepwise.app"
 DMG_DIR="src-tauri/target/${TARGET}/release/bundle/dmg"
+
+echo
+echo "==> Verifying Google OAuth credentials are embedded in the app binary"
+# Prove option_env! actually captured the creds at compile time. cargo can serve
+# a stale cached compile that predates a creds change; without this, that ships a
+# silently-broken app. The embedded client id appears verbatim in the binary.
+if grep -qa 'apps\.googleusercontent\.com' "$APP/Contents/MacOS/"* 2>/dev/null; then
+  echo "    embedded client id found ✓"
+else
+  echo "error: the built app has no embedded GOOGLE_CLIENT_ID." >&2
+  echo "       option_env! captured nothing — ensure .env has the creds, then" >&2
+  echo "       force a rebuild: (cd src-tauri && cargo clean -p stepwise)." >&2
+  exit 1
+fi
 
 echo
 echo "==> Verifying code signature"

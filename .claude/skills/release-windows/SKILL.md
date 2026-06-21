@@ -26,6 +26,7 @@ Do **not** trigger for a local dev build (`npm run tauri dev`, `cargo build`).
 
 - **Toolchain:** Node + npm, Rust (MSVC toolchain), and the Tauri prerequisites (WebView2 is present on Win10/11). `gh` authenticated (`gh auth status`), `git` configured.
 - **Updater key:** copy `~/.tauri/stepwise-updater.key` from the Mac, then set `TAURI_SIGNING_PRIVATE_KEY` (path or base64 contents) and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` in `.env`. **It must be the same key as macOS** or the signature won't validate against the embedded pubkey. `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` **must match the key's password** — set it to `""` if the key has none. The script signs via `tauri signer sign -p <password>`, so an empty password works; a wrong/omitted one fails the preflight's *"Updater key can sign"* check in ~2s (before any build).
+- **Google OAuth creds:** set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `.env` (the **same values as the Mac** — see `.env.example`). They are **compiled into the binary** at build time (`option_env!` in `state/mod.rs`), so a build without them silently ships an app that can't reach Google. The preflight fails fast if either is missing.
 - **Verified commits (for the "Verified" badge):** set up SSH commit signing once — see `docs/RELEASE.md` → *Verified commits*. Then the manifest commit below shows as Verified on GitHub.
 
 > Verify all of the above at once with `./scripts/release-win.ps1 -Preflight` (checklist only — builds nothing).
@@ -35,6 +36,7 @@ Do **not** trigger for a local dev build (`npm run tauri dev`, `cargo build`).
 0. **Preflight — run this first, especially on a new machine.** `./scripts/release-win.ps1 -Preflight` prints a ✓/✗ readiness checklist with the exact fix for each gap, and builds/uploads nothing:
    - toolchain — Node/npm, Rust + **MSVC** toolchain, Tauri CLI
    - `gh` authenticated
+   - Google OAuth creds present (`GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`, compiled into the binary)
    - updater key resolves (`TAURI_SIGNING_PRIVATE_KEY` → an existing file or inline key)
    - on `main`, up to date with the remote; the `tauri.conf.json` version
    - `updater/latest.json` is at that version **with the mac's `darwin-*` signatures**

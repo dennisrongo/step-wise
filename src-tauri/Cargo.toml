@@ -1,6 +1,6 @@
 [package]
 name = "stepwise"
-version = "0.1.0"
+version = "0.1.1"
 description = "Stepwise — a calm macOS menu-bar health dashboard."
 authors = ["Dennis Rongo"]
 edition = "2021"

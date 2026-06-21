@@ -178,6 +178,18 @@ function Invoke-Preflight {
     }
   }
 
+  # --- Google OAuth creds (compiled into the binary at build time) ---
+  # state/mod.rs bakes GOOGLE_CLIENT_ID/SECRET into the binary via option_env!.
+  # A build without them silently ships an app that can't reach Google
+  # ("request for your activity failed"). Required for ANY build (dry run too),
+  # like the updater key. (The NSIS installer is LZMA-compressed, so a post-build
+  # grep is unreliable on Windows; this pre-build env check is the guard.)
+  if ([string]::IsNullOrWhiteSpace($env:GOOGLE_CLIENT_ID) -or [string]::IsNullOrWhiteSpace($env:GOOGLE_CLIENT_SECRET)) {
+    Add-Check 'Google OAuth creds' 'FAIL' 'GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set' 'Set both in .env (same values as the Mac, see .env.example) - they are compiled into the binary so the shipped app can reach Google.'
+  } else {
+    Add-Check 'Google OAuth creds' 'OK' 'both present'
+  }
+
   # --- Git / branch / freshness ---
   if (-not (Has-Command 'git')) {
     Add-Check 'Git' 'FAIL' '' 'Install Git for Windows: https://git-scm.com.'

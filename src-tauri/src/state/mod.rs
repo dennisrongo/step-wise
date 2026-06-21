@@ -19,8 +19,17 @@ impl AppState {
             demo,
             syncing: false,
             http: reqwest::Client::new(),
-            client_id: std::env::var("GOOGLE_CLIENT_ID").ok().filter(|s| !s.is_empty()),
-            client_secret: std::env::var("GOOGLE_CLIENT_SECRET").ok().filter(|s| !s.is_empty()),
+            // Runtime env wins (dev / `.env`); fall back to values baked in at
+            // build time via `option_env!`, so distributed bundles — which inherit
+            // neither the shell env nor the gitignored `.env` — still have creds.
+            client_id: std::env::var("GOOGLE_CLIENT_ID")
+                .ok()
+                .or_else(|| option_env!("GOOGLE_CLIENT_ID").map(str::to_owned))
+                .filter(|s| !s.is_empty()),
+            client_secret: std::env::var("GOOGLE_CLIENT_SECRET")
+                .ok()
+                .or_else(|| option_env!("GOOGLE_CLIENT_SECRET").map(str::to_owned))
+                .filter(|s| !s.is_empty()),
         }
     }
 
