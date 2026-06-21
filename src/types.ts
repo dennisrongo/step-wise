@@ -40,3 +40,10 @@ export interface DaySummary {
 export interface WeekSummary {
   days: DaySummary[]; // 7 entries, oldest → today (today last)
 }
+
+/** What `refresh_now` returns: fresh status plus the week it just fetched, so
+ * the frontend applies both from one fetch instead of re-querying the week. */
+export interface RefreshResult {
+  status: SyncStatus;
+  week: WeekSummary;
+}

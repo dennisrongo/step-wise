@@ -5,6 +5,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { isTauriReady } from "../tauriReady";
 import { fitWindowHeight } from "../platform";
+import { REFRESH_MS } from "../refreshInterval";
 import { DEMO_STATUS, DEMO_WEEK } from "../mockData";
 import { nf, toGo } from "../format";
 import type { DaySummary, SyncStatus, WeekSummary } from "../types";
@@ -20,8 +21,10 @@ async function call<T>(command: string, fallback: T): Promise<T> {
 
 /**
  * Compact glance of today's activity, shown in its own borderless window when
- * the cursor hovers the tray icon. Refreshes on mount and on each `hover-show`
- * event from the tray, and fits its window to the rendered card height.
+ * the cursor hovers the tray icon. Refreshes on mount, on each `hover-show`
+ * event, and then on the user's auto-refresh cadence while it's on screen —
+ * polling stops on `hover-hide` so a hidden glance never hits Google. Fits its
+ * window to the rendered card height.
  */
 export function HoverPopover() {
   const [status, setStatus] = useState<SyncStatus | null>(null);
@@ -46,9 +49,32 @@ export function HoverPopover() {
   useEffect(() => {
     load();
     if (!isTauriReady()) return;
-    const un = listen("hover-show", () => load());
+
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const stop = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = undefined;
+      }
+    };
+    // Refresh every 30s, but only while the glance is actually shown — polling
+    // starts on `hover-show` and stops on `hover-hide`, so a hidden glance uses
+    // no bandwidth.
+    const start = () => {
+      stop();
+      timer = setInterval(() => void load(), REFRESH_MS);
+    };
+
+    const unShow = listen("hover-show", () => {
+      void load();
+      start();
+    });
+    const unHide = listen("hover-hide", stop);
+
     return () => {
-      un.then((f) => f());
+      stop();
+      unShow.then((f) => f());
+      unHide.then((f) => f());
     };
   }, [load]);
 

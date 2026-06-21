@@ -136,6 +136,8 @@ fn show_hover(app: &AppHandle, rect: Rect) {
 fn hide_hover(app: &AppHandle) {
     if let Some(win) = app.get_webview_window(HOVER_LABEL) {
         let _ = win.hide();
+        // Let the popover stop its auto-refresh loop — no polling while hidden.
+        let _ = app.emit("hover-hide", ());
     }
 }
 

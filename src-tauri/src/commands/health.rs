@@ -193,12 +193,23 @@ pub async fn disconnect(
     Ok(status_from(&st))
 }
 
+/// A refresh's fresh status **and** the week it just fetched. Returning both
+/// lets the frontend apply the new numbers from this single fetch instead of
+/// following up with a second `get_week_summary` (which would double every
+/// auto-refresh tick's API cost).
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RefreshResult {
+    pub status: SyncStatus,
+    pub week: WeekSummary,
+}
+
 #[tauri::command]
 pub async fn refresh_now(
     app: AppHandle,
     state: State<'_, Mutex<AppState>>,
     active_mode: Option<String>,
-) -> Result<SyncStatus, String> {
+) -> Result<RefreshResult, String> {
     {
         state.lock().await.syncing = true;
     }
@@ -208,12 +219,15 @@ pub async fn refresh_now(
     let mut st = state.lock().await;
     st.syncing = false;
     match result {
-        Ok(_) => {
+        Ok(week) => {
             if !st.demo {
                 st.settings.last_synced_at = Some(now);
                 let _ = st.settings.save(&app);
             }
-            Ok(status_from(&st))
+            Ok(RefreshResult {
+                status: status_from(&st),
+                week,
+            })
         }
         Err(e) => Err(e),
     }

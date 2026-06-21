@@ -9,7 +9,7 @@ pub mod state;
 pub mod storage;
 pub mod tray;
 
-use tauri::{Manager, WindowEvent};
+use tauri::Manager;
 use tokio::sync::Mutex;
 
 use state::AppState;
@@ -56,15 +56,9 @@ pub fn run() {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
-            // Hide the panel when it loses focus, like a native menu-bar popover.
-            if let Some(win) = app.get_webview_window("main") {
-                let w = win.clone();
-                win.on_window_event(move |event| {
-                    if let WindowEvent::Focused(false) = event {
-                        let _ = w.hide();
-                    }
-                });
-            }
+            // The panel deliberately stays open when it loses focus (like the
+            // agent-status widget) — it's dismissed only by toggling the tray
+            // icon — so there's no focus-loss auto-hide here.
             Ok(())
         })
         .run(tauri::generate_context!())
