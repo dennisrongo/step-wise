@@ -1,7 +1,7 @@
 {
   "version": "0.2.0",
   "notes": "Stepwise 0.2.0",
-  "pub_date": "2026-06-21T17:40:19Z",
+  "pub_date": "2026-06-21T17:54:21Z",
   "platforms": {
     "darwin-aarch64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSQTRaQ3BnMVhoRnhkSjJsR3AxV0JoRzNNY21nV0ZPOU0vT0NrQjJzQk1PSG4wK0J6VUZGREZVQnR5aytHb0s2T3BsN0RjUDVGRlBUWXlaRmhiWkRsaDl5SE9nMDdNVHcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgyMDYzNjE4CWZpbGU6U3RlcHdpc2UuYXBwLnRhci5negpHamZwN3FFNHh1aEhoUVZFOWM4akZvcGR3d0hHdUJEVlB2ZkZubnRwY20zd3V6dXFVYktiaHBKbnNJRTcrZ0FUNzhZR1RFR21JeWE3SGNVYVczUXNDdz09Cg==",
@@ -10,6 +10,10 @@
     "darwin-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSQTRaQ3BnMVhoRnhkSjJsR3AxV0JoRzNNY21nV0ZPOU0vT0NrQjJzQk1PSG4wK0J6VUZGREZVQnR5aytHb0s2T3BsN0RjUDVGRlBUWXlaRmhiWkRsaDl5SE9nMDdNVHcwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgyMDYzNjE4CWZpbGU6U3RlcHdpc2UuYXBwLnRhci5negpHamZwN3FFNHh1aEhoUVZFOWM4akZvcGR3d0hHdUJEVlB2ZkZubnRwY20zd3V6dXFVYktiaHBKbnNJRTcrZ0FUNzhZR1RFR21JeWE3SGNVYVczUXNDdz09Cg==",
       "url": "https://github.com/dennisrongo/step-wise/releases/download/v0.2.0/Stepwise.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSQTRaQ3BnMVhoRjJXWUl0dTBZZmphbWsySzl5b29BSW9WbmJlVG1HN09SYVNpMUlNN1M4aExVWlc4bFlHZUU2MmdETlM1SVNWR244VTR0SGRPUXZuWmVFeW5nYzlXaVFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgyMDY0NDYxCWZpbGU6U3RlcHdpc2VfMC4yLjBfeDY0LXNldHVwLm5zaXMuemlwCmNaOS9jUXIzSXpOV1NPVFMxWjEwV3Y3Z1hJcHE4TWYzMW5LZ0xoZGdTVE1nSTRJcG00QzBDekN3em9uWnhrTkNheXp0M0h5a1dZcG95aXZmeFpPM0JnPT0K",
+      "url": "https://github.com/dennisrongo/step-wise/releases/download/v0.2.0/Stepwise_0.2.0_x64-setup.nsis.zip"
     }
   }
 }
