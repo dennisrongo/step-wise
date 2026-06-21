@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "notes": "Stepwise 0.1.0",
+  "pub_date": "2026-06-21T04:59:06Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSQTRaQ3BnMVhoRjM5KzRpMWl0TG42NE1wZk9Ya2drdkx6Qm1WbFlvVGtxSUVBQlJjMloyTldYQkovUjVkejhXcFJ5b2RWcC8zeEVxeUxLSUs4b1h1dUM3ckxiQnIyRGdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgyMDE3OTQ1CWZpbGU6U3RlcHdpc2UuYXBwLnRhci5negptWXk2aWZtSVpQNHhDZVVoWUQvZjRyWGFkV2RCRWlRdmtic2o4aXZWVGxMSUNDOTE4bkJLaGNNRFdLQ2g4N1MwdDY0YmdNamM0eGtnRnByOExBcTdEdz09Cg==",
+      "url": "https://github.com/dennisrongo/step-wise/releases/download/v0.1.0/Stepwise.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVSQTRaQ3BnMVhoRjM5KzRpMWl0TG42NE1wZk9Ya2drdkx6Qm1WbFlvVGtxSUVBQlJjMloyTldYQkovUjVkejhXcFJ5b2RWcC8zeEVxeUxLSUs4b1h1dUM3ckxiQnIyRGdNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzgyMDE3OTQ1CWZpbGU6U3RlcHdpc2UuYXBwLnRhci5negptWXk2aWZtSVpQNHhDZVVoWUQvZjRyWGFkV2RCRWlRdmtic2o4aXZWVGxMSUNDOTE4bkJLaGNNRFdLQ2g4N1MwdDY0YmdNamM0eGtnRnByOExBcTdEdz09Cg==",
+      "url": "https://github.com/dennisrongo/step-wise/releases/download/v0.1.0/Stepwise.app.tar.gz"
+    }
+  }
+}
