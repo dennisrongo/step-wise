@@ -8,7 +8,7 @@ use crate::storage;
 
 const SETTINGS_FILE: &str = "settings.json";
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     /// Google Health OAuth refresh token, AES-256-GCM encrypted at rest.
@@ -17,6 +17,20 @@ pub struct Settings {
     pub last_synced_at: Option<String>,
     /// Manual theme override: "light" | "dark" | null (follow system).
     pub theme: Option<String>,
+    /// Register the app to launch automatically at login. A menu-bar app is
+    /// expected to persist, so this defaults on.
+    pub launch_on_startup: bool,
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            google_refresh_token: None,
+            last_synced_at: None,
+            theme: None,
+            launch_on_startup: true,
+        }
+    }
 }
 
 impl Settings {

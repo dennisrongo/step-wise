@@ -7,6 +7,7 @@ import { getThemeMode, setThemeMode, type ThemeMode } from "../theme";
 import { getActiveMode, setActiveMode, type ActiveMode } from "../activeMode";
 import { clampGoal, getGoal, setGoal, GOAL_STEP, MIN_GOAL, MAX_GOAL } from "../goal";
 import { useUpdater } from "../hooks/useUpdater";
+import { useLaunchOnStartup } from "../hooks/useLaunchOnStartup";
 import { nf } from "../format";
 import type { SyncStatus } from "../types";
 
@@ -66,6 +67,7 @@ export function Settings({
   const [goal, setGoalState] = useState<number>(getGoal());
   const [version, setVersion] = useState("0.1.0");
   const upd = useUpdater({ auto: false });
+  const launch = useLaunchOnStartup();
 
   useEffect(() => {
     if (!isTauriReady()) return;
@@ -146,6 +148,29 @@ export function Settings({
               ))}
             </div>
             <div className="ap-help">Match your Mac's appearance, or force a mode.</div>
+          </div>
+        </div>
+
+        <div className="set-section">
+          <div className="set-label">Startup</div>
+          <div className="set-card">
+            <div className="set-row">
+              <div className="r-main">
+                <span className="r-label">Launch at login</span>
+                <span className="r-sub">Open Stepwise automatically when you sign in.</span>
+              </div>
+              <span className="r-spacer" />
+              <button
+                type="button"
+                role="switch"
+                aria-checked={launch.enabled}
+                aria-label="Launch at login"
+                className={`tog${launch.enabled ? " on" : ""}`}
+                onClick={() => launch.toggle(!launch.enabled)}
+              >
+                <span className="tog-knob" />
+              </button>
+            </div>
           </div>
         </div>
 

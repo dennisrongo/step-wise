@@ -10,6 +10,7 @@ pub mod storage;
 pub mod tray;
 
 use tauri::{Emitter, Manager};
+use tauri_plugin_autostart::MacosLauncher;
 use tokio::sync::Mutex;
 
 use state::AppState;
@@ -36,6 +37,10 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec![]),
+        ))
         .invoke_handler(tauri::generate_handler![
             commands::get_sync_status,
             commands::connect_google_health,
@@ -45,15 +50,26 @@ pub fn run() {
             commands::get_day_summary,
             commands::app_version,
             commands::fit_tray_window,
+            commands::get_launch_on_startup,
+            commands::set_launch_on_startup,
         ])
         .setup(|app| {
             let demo = std::env::var("STEPWISE_DEMO")
                 .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
                 .unwrap_or(false);
             let settings = settings::Settings::load(&app.handle().clone()).unwrap_or_default();
+            let launch_on_startup = settings.launch_on_startup;
             app.manage(Mutex::new(AppState::new(settings, demo)));
 
             tray::create_tray(&app.handle().clone())?;
+
+            // Keep the OS launch-at-login registration honest with the saved
+            // setting (defaults on — a menu-bar app is expected to persist).
+            // No-op in dev builds, so `tauri dev`'s throwaway binary is never
+            // written as a login item.
+            if let Err(e) = commands::apply_autostart(&app.handle().clone(), launch_on_startup) {
+                tracing::warn!("failed to sync launch-at-login: {e}");
+            }
 
             // Menu-bar agent: no Dock icon / app-switcher entry on macOS.
             #[cfg(target_os = "macos")]
